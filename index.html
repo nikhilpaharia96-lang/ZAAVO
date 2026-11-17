@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ZAAVO — Campus Food & Fitness Delivery</title>
+<meta name="description" content="ZAAVO - Premium food delivery for college students, hostel residents & gym warriors. Healthy meals, fast delivery, unbeatable prices." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root {
+    --orange: #FF5722;
+    --orange-light: #FF7043;
+    --lime: #AEEA00;
+    --lime-dark: #8BC34A;
+    --dark: #0A0A0A;
+    --dark-2: #111111;
+    --dark-3: #1A1A1A;
+    --dark-4: #222222;
+    --gray: #888888;
+    --gray-light: #CCCCCC;
+    --white: #FFFFFF;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--dark);
+    color: var(--white);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  .font-display { font-family: 'Syne', sans-serif; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--dark-2); }
+  ::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 2px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideRight {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+  }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(255,87,34,0.3); }
+    50% { box-shadow: 0 0 40px rgba(255,87,34,0.6); }
+  }
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes shimmer {
+    from { background-position: -200% 0; }
+    to { background-position: 200% 0; }
+  }
+  @keyframes blob {
+    0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .animate-fade-up { animation: fadeUp 0.6s ease forwards; }
+  .animate-fade-in { animation: fadeIn 0.5s ease forwards; }
+  .animate-slide-right { animation: slideRight 0.5s ease forwards; }
+  .animate-float { animation: float 4s ease-in-out infinite; }
+  .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+  .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+  .animate-blob { animation: blob 8s ease-in-out infinite; }
+  .animate-marquee { animation: marquee 20s linear infinite; }
+  .animate-gradient { animation: gradient-shift 4s ease infinite; background-size: 200% 200%; }
+
+  .delay-100 { animation-delay: 0.1s; }
+  .delay-200 { animation-delay: 0.2s; }
+  .delay-300 { animation-delay: 0.3s; }
+  .delay-400 { animation-delay: 0.4s; }
+  .delay-500 { animation-delay: 0.5s; }
+
+  .glass {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .glass-orange {
+    background: rgba(255,87,34,0.08);
+    border: 1px solid rgba(255,87,34,0.2);
+    backdrop-filter: blur(20px);
+  }
+  .gradient-text {
+    background: linear-gradient(135deg, var(--orange), #FF9800, var(--lime));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .gradient-orange {
+    background: linear-gradient(135deg, var(--orange), #FF9800);
+  }
+  .gradient-lime {
+    background: linear-gradient(135deg, var(--lime), var(--lime-dark));
+  }
+  .hero-gradient {
+    background: radial-gradient(ellipse at 20% 50%, rgba(255,87,34,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(174,234,0,0.08) 0%, transparent 50%),
+                var(--dark);
+  }
+  .card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(255,87,34,0.15);
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--orange), #FF7043);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.5s ease;
+  }
+  .btn-primary:hover::before { left: 100%; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,87,34,0.4); }
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+  .skeleton {
+    background: linear-gradient(90deg, var(--dark-3) 25%, var(--dark-4) 50%, var(--dark-3) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+  }
+  .tag-lime {
+    background: rgba(174,234,0,0.1);
+    border: 1px solid rgba(174,234,0,0.25);
+    color: var(--lime);
+  }
+  .tag-orange {
+    background: rgba(255,87,34,0.1);
+    border: 1px solid rgba(255,87,34,0.25);
+    color: var(--orange);
+  }
+  .nav-link {
+    position: relative;
+    color: var(--gray-light);
+    transition: color 0.2s ease;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0;
+    width: 0; height: 2px;
+    background: var(--orange);
+    transition: width 0.3s ease;
+  }
+  .nav-link:hover { color: white; }
+  .nav-link:hover::after { width: 100%; }
+  .input-field {
+    background: var(--dark-3);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: white;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .input-field:focus { border-color: var(--orange); }
+  .input-field::placeholder { color: var(--gray); }
+  .star-filled { color: #FFB800; }
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(10,10,10,0.95);
+    border-top: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    z-index: 100;
+    display: none;
+  }
+  @media (max-width: 768px) {
+    .bottom-nav { display: flex; }
+    .hide-mobile { display: none !important; }
+  }
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-content {
+    animation: fadeUp 0.3s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .progress-bar {
+    background: linear-gradient(90deg, var(--orange), #FF9800);
+    height: 4px;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+  .notification-dot {
+    position: absolute;
+    top: -4px; right: -4px;
+    width: 18px; height: 18px;
+    background: var(--orange);
+    border-radius: 50%;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    border: 2px solid var(--dark);
+  }
+  .noise-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.02;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .order-status-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    animation: pulse-glow 2s infinite;
+  }
+  .cuisine-chip {
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--gray-light);
+  }
+  .cuisine-chip:hover, .cuisine-chip.active {
+    border-color: var(--orange);
+    color: white;
+    background: rgba(255,87,34,0.1);
+  }
+  .macro-bar {
+    height: 6px;
+    border-radius: 3px;
+    transition: width 0.8s ease;
+  }
+  .swipe-indicator {
+    width: 40px; height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="noise-overlay"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+
+const RESTAURANTS = [
+  { id: 1, name: "The Protein Kitchen", cuisine: "Fitness & Healthy", rating: 4.8, reviews: 1204, time: "18-25 min", distance: "0.8 km", price: "₹₹", tags: ["High Protein", "Vegan Options", "Gym Approved"], image: "🥗", bg: "from-green-900/40 to-lime-900/40", badge: "Trending", offers: "20% off on first order", isOpen: true, featured: true },
+  { id: 2, name: "Campus Bites", cuisine: "Indian Street Food", rating: 4.6, reviews: 876, time: "12-20 min", distance: "0.3 km", price: "₹", tags: ["Budget Friendly", "Student Special", "Fast"], image: "🌮", bg: "from-orange-900/40 to-red-900/40", badge: "Budget Pick", offers: "Free delivery above ₹99", isOpen: true, featured: true },
+  { id: 3, name: "Muscle Meal Co.", cuisine: "Fitness & Nutrition", rating: 4.9, reviews: 2103, time: "25-35 min", distance: "1.2 km", price: "₹₹₹", tags: ["Keto", "Macro Tracked", "Bulk Orders"], image: "💪", bg: "from-blue-900/40 to-purple-900/40", badge: "Top Rated", offers: "Subscription 30% off", isOpen: true, featured: true },
+  { id: 4, name: "Desi Dhaba Express", cuisine: "North Indian", rating: 4.4, reviews: 532, time: "15-22 min", distance: "0.5 km", price: "₹", tags: ["Comfort Food", "Homestyle", "Quick"], image: "🍛", bg: "from-yellow-900/40 to-amber-900/40", badge: null, offers: null, isOpen: true, featured: false },
+  { id: 5, name: "Green Bowl", cuisine: "Salads & Wraps", rating: 4.7, reviews: 789, time: "10-18 min", distance: "0.6 km", price: "₹₹", tags: ["Vegan", "Organic", "Light Meals"], image: "🥙", bg: "from-emerald-900/40 to-teal-900/40", badge: "Healthy Choice", offers: "Buy 2 get 1 free bowl", isOpen: true, featured: false },
+  { id: 6, name: "Pizza Lab", cuisine: "Italian & Fusion", rating: 4.5, reviews: 1432, time: "20-30 min", distance: "0.9 km", price: "₹₹", tags: ["High Calorie", "Cheat Meal", "Sharing"], image: "🍕", bg: "from-red-900/40 to-pink-900/40", badge: null, offers: "Friday special 40% off", isOpen: false, featured: false },
+  { id: 7, name: "Shake Station", cuisine: "Beverages & Smoothies", rating: 4.8, reviews: 654, time: "8-15 min", distance: "0.4 km", price: "₹₹", tags: ["Post Workout", "Fresh", "Energy Boost"], image: "🥤", bg: "from-purple-900/40 to-violet-900/40", badge: "Fan Favorite", offers: "Free protein shot today", isOpen: true, featured: false },
+  { id: 8, name: "Roti Wala", cuisine: "Indian Homefood", rating: 4.3, reviews: 298, time: "20-28 min", distance: "1.0 km", price: "₹", tags: ["Homemade", "Fresh", "Value"], image: "🫓", bg: "from-stone-900/40 to-zinc-900/40", badge: null, offers: null, isOpen: true, featured: false },
+];
+
+const FOODS = [
+  { id: 1, name: "High Protein Chicken Bowl", restaurant: "The Protein Kitchen", price: 249, originalPrice: 299, rating: 4.9, calories: 520, protein: 48, carbs: 35, fat: 12, category: "High Protein", tags: ["Keto Friendly", "Post Workout"], image: "🍱", dietType: "non-veg", popular: true },
+  { id: 2, name: "Masala Maggi Stack", restaurant: "Campus Bites", price: 69, originalPrice: 79, rating: 4.5, calories: 380, protein: 8, carbs: 62, fat: 11, category: "Budget Meal", tags: ["Late Night", "Quick Fix"], image: "🍜", dietType: "veg", popular: true },
+  { id: 3, name: "Vegan Protein Wrap", restaurant: "Green Bowl", price: 189, originalPrice: 220, rating: 4.7, calories: 410, protein: 22, carbs: 48, fat: 9, category: "Vegan", tags: ["Plant Based", "Clean Eating"], image: "🌯", dietType: "vegan", popular: false },
+  { id: 4, name: "Bulk Up Thali", restaurant: "Muscle Meal Co.", price: 349, originalPrice: 399, rating: 4.8, calories: 1200, protein: 65, carbs: 140, fat: 28, category: "Bulking", tags: ["Mass Gain", "Calorie Dense"], image: "🍽️", dietType: "non-veg", popular: true },
+  { id: 5, name: "Cutting Phase Salad", restaurant: "Muscle Meal Co.", price: 279, originalPrice: 310, rating: 4.6, calories: 285, protein: 35, carbs: 18, fat: 8, category: "Cutting", tags: ["Low Carb", "Fat Loss"], image: "🥗", dietType: "non-veg", popular: false },
+  { id: 6, name: "Post-Workout Shake", restaurant: "Shake Station", price: 159, originalPrice: 179, rating: 4.9, calories: 320, protein: 40, carbs: 30, fat: 4, category: "High Protein", tags: ["Recovery", "Energy"], image: "🥤", dietType: "veg", popular: true },
+  { id: 7, name: "Aloo Paratha Combo", restaurant: "Roti Wala", price: 89, originalPrice: 99, rating: 4.2, calories: 480, protein: 12, carbs: 72, fat: 16, category: "Budget Meal", tags: ["Comfort Food", "Filling"], image: "🫓", dietType: "veg", popular: true },
+  { id: 8, name: "Grilled Paneer Tikka", restaurant: "The Protein Kitchen", price: 199, originalPrice: 229, rating: 4.7, calories: 350, protein: 28, carbs: 12, fat: 22, category: "High Protein", tags: ["Vegetarian", "Gym Snack"], image: "🧀", dietType: "veg", popular: true },
+];
+
+const FITNESS_MEALS = [
+  { id: 1, name: "Shredder Box", goal: "Cutting", calories: 285, protein: 38, carbs: 15, fat: 7, price: 289, image: "🔥", color: "from-red-500 to-orange-500", desc: "Low-cal lean beast mode meal" },
+  { id: 2, name: "Mass Monster Thali", goal: "Bulking", calories: 1350, protein: 72, carbs: 155, fat: 32, price: 399, image: "💪", color: "from-blue-500 to-indigo-500", desc: "For those serious gains" },
+  { id: 3, name: "Vegan Warrior Bowl", goal: "Vegan", calories: 390, protein: 24, carbs: 52, fat: 9, price: 249, image: "🌱", color: "from-green-500 to-teal-500", desc: "Plant-powered protein punch" },
+  { id: 4, name: "Keto King Platter", goal: "Keto", calories: 480, protein: 42, carbs: 6, fat: 32, price: 329, image: "👑", color: "from-purple-500 to-pink-500", desc: "Zero carb, max fat burn" },
+  { id: 5, name: "Recovery Protein Pack", goal: "High Protein", calories: 520, protein: 55, carbs: 38, fat: 10, price: 319, image: "⚡", color: "from-yellow-500 to-amber-500", desc: "Post-workout muscle repair" },
+  { id: 6, name: "Lean & Mean Wrap", goal: "Weight Loss", calories: 310, protein: 32, carbs: 28, fat: 8, price: 219, image: "🎯", color: "from-cyan-500 to-sky-500", desc: "Calorie deficit perfection" },
+];
+
+const CATEGORIES = [
+  { id: 1, name: "Burgers", icon: "🍔", count: 24, color: "from-orange-500/20 to-red-500/20" },
+  { id: 2, name: "Pizza", icon: "🍕", count: 18, color: "from-red-500/20 to-pink-500/20" },
+  { id: 3, name: "Biryani", icon: "🍛", count: 31, color: "from-yellow-500/20 to-amber-500/20" },
+  { id: 4, name: "Salads", icon: "🥗", count: 15, color: "from-green-500/20 to-lime-500/20" },
+  { id: 5, name: "Shakes", icon: "🥤", count: 22, color: "from-purple-500/20 to-violet-500/20" },
+  { id: 6, name: "Wraps", icon: "🌯", count: 12, color: "from-teal-500/20 to-cyan-500/20" },
+  { id: 7, name: "Snacks", icon: "🍟", count: 28, color: "from-amber-500/20 to-orange-500/20" },
+  { id: 8, name: "Desserts", icon: "🍰", count: 16, color: "from-pink-500/20 to-rose-500/20" },
+];
+
+const OFFERS = [
+  { id: 1, title: "Student Saver", desc: "20% off every order above ₹199", code: "CAMPUS20", color: "from-orange-600 to-red-600", icon: "🎓" },
+  { id: 2, title: "Gym Warrior", desc: "Free protein shake with any fitness meal", code: "GYMPOWER", color: "from-lime-600 to-green-600", icon: "💪" },
+  { id: 3, title: "Midnight Muncher", desc: "50% off after 10 PM every night", code: "NIGHT50", color: "from-purple-600 to-indigo-600", icon: "🌙" },
+  { id: 4, title: "First Order", desc: "Flat ₹100 off on your first delivery", code: "ZAAVO100", color: "from-blue-600 to-cyan-600", icon: "🎉" },
+];
+
+const TESTIMONIALS = [
+  { name: "Rohan Sharma", role: "IIT Delhi, 3rd Year", text: "Finally an app that understands hostel life. Fast delivery, cheap prices, and the protein meals are 🔥", rating: 5, avatar: "RS" },
+  { name: "Priya Mehta", role: "Gym Trainer, FitLife Studio", text: "My clients use ZAAVO for macro-tracked meals. The nutrition info is accurate and the food is actually good!", rating: 5, avatar: "PM" },
+  { name: "Arjun Reddy", role: "NIT Warangal, Final Year", text: "Campus Bites on ZAAVO saved me during exam season. ₹69 Maggi Stack at midnight? Unbeatable.", rating: 5, avatar: "AR" },
+  { name: "Sneha Patel", role: "CrossFit Athlete", text: "The bulking thali hits 1200 calories perfectly. No more meal prep drama — ZAAVO sorts it all!", rating: 5, avatar: "SP" },
+];
+
+const ORDERS_HISTORY = [
+  { id: "ZAV-8821", restaurant: "The Protein Kitchen", items: ["High Protein Bowl", "Protein Shake"], total: 408, status: "Delivered", date: "Today, 1:30 PM", statusColor: "text-lime-400" },
+  { id: "ZAV-8745", restaurant: "Campus Bites", items: ["Masala Maggi Stack x2", "Cold Coffee"], total: 178, status: "Delivered", date: "Yesterday, 11:45 PM", statusColor: "text-lime-400" },
+  { id: "ZAV-8612", restaurant: "Muscle Meal Co.", items: ["Bulk Up Thali"], total: 349, status: "Delivered", date: "2 days ago", statusColor: "text-lime-400" },
+];
+
+const SUBSCRIPTION_PLANS = [
+  { name: "Basic", price: 999, period: "month", meals: 15, discount: "10%", features: ["15 meals/month", "Priority delivery", "₹50 credits/meal", "Basic nutrition tracking"], color: "from-gray-700 to-gray-800", badge: null },
+  { name: "Pro Athlete", price: 1999, period: "month", meals: 30, discount: "20%", features: ["30 meals/month", "Express delivery", "Macro tracking", "Custom meal plans", "Gym partner discounts"], color: "from-orange-800 to-red-800", badge: "Most Popular" },
+  { name: "Elite", price: 3499, period: "month", meals: 60, discount: "30%", features: ["60 meals/month", "Zero delivery fees", "Personal nutrition coach", "Advanced analytics", "Priority support", "Community access"], color: "from-lime-800 to-green-800", badge: "Best Value" },
+];
+
+// ═══════════════════════════════════════
+// ICONS (inline SVG)
+// ═══════════════════════════════════════
+
+const Icon = ({ name, size = 20, className = "", strokeWidth = 1.8 }) => {
+  const icons = {
+    home: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+    search: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>,
+    cart: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>,
+    user: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+    heart: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>,
+    star: <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+    clock: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+    location: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>,
+    plus: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+    minus: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+    x: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    check: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"/></svg>,
+    menu: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
+    arrow_right: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
+    fire: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>,
+    zap: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+    bike: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-4"/><path d="m9 6 4 5.5"/><path d="M5.5 17.5 9 6"/><path d="m15 6 3 11.5"/><path d="M15 6h4"/></svg>,
+    shield: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+    gift: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>,
+    bell: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
+    package: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
+    logout: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+    filter: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>,
+    tag: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>,
+    trend: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
+    copy: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
+    phone: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.26 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.08 6.08l.86-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
+    mail: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>,
+    lock: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
+    eye: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+    eye_off: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>,
+    settings: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+  };
+  return icons[name] || null;
+};
+
+// ═══════════════════════════════════════
+// COMPONENTS
+// ═══════════════════════════════════════
+
+const StarRating = ({ rating }) => (
+  <div className="flex items-center gap-1">
+    <Icon name="star" size={13} className="star-filled" />
+    <span className="text-sm font-semibold text-white">{rating}</span>
+  </div>
+);
+
+const Badge = ({ text, type = "orange" }) => (
+  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${type === 'lime' ? 'tag-lime' : 'tag-orange'}`}>
+    {text}
+  </span>
+);
+
+const MacroBar = ({ label, value, max, color }) => (
+  <div>
+    <div className="flex justify-between mb-1">
+      <span className="text-xs text-gray-400">{label}</span>
+      <span className="text-xs font-bold text-white">{value}g</span>
+    </div>
+    <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+      <div className={`macro-bar ${color}`} style={{width: `${Math.min((value/max)*100, 100)}%`}} />
+    </div>
+  </div>
+);
+
+// ═══════════════════════════════════════
+// NAVBAR
+// ═══════════════════════════════════════
+
+const Navbar = ({ page, setPage, cartCount, isLoggedIn, setIsLoggedIn }) => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', fn);
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
+
+  return (
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'glass border-b border-white/5 py-3' : 'py-5'}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
+        {/* Logo */}
+        <button onClick={() => setPage('home')} className="flex items-center gap-2">
+          <div className="w-9 h-9 rounded-xl gradient-orange flex items-center justify-center font-display font-black text-white text-lg">Z</div>
+          <span className="font-display font-black text-2xl tracking-tight">
+            ZA<span className="gradient-text">AVO</span>
+          </span>
+        </button>
+
+        {/* Center Nav */}
+        <div className="hidden md:flex items-center gap-8">
+          {[['home','Home'],['restaurants','Restaurants'],['fitness','Gym Meals'],['offers','Offers']].map(([p,l]) => (
+            <button key={p} onClick={() => setPage(p)} className={`nav-link font-medium text-sm transition-colors ${page===p ? 'text-white' : 'text-gray-400'}`}>{l}</button>
+          ))}
+        </div>
+
+        {/* Right Actions */}
+        <div className="flex items-center gap-3">
+          <button onClick={() => setPage('search')} className="p-2 rounded-xl hover:bg-white/5 transition-colors text-gray-400 hover:text-white">
+            <Icon name="search" size={20} />
+          </button>
+          <button onClick={() => setPage('cart')} className="relative p-2 rounded-xl hover:bg-white/5 transition-colors text-gray-400 hover:text-white">
+            <Icon name="cart" size={20} />
+            {cartCount > 0 && <span className="notification-dot">{cartCount}</span>}
+          </button>
+          {isLoggedIn ? (
+            <button onClick={() => setPage('profile')} className="w-9 h-9 rounded-xl gradient-orange flex items-center justify-center text-white font-bold text-sm">RS</button>
+          ) : (
+            <button onClick={() => setPage('login')} className="btn-primary px-5 py-2 rounded-xl text-sm font-semibold font-display">Login</button>
+          )}
+          <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 rounded-xl hover:bg-white/5 text-gray-400">
+            <Icon name="menu" size={20} />
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {mobileOpen && (
+        <div className="md:hidden glass border-t border-white/5 px-4 py-4 mt-2">
+          {[['home','🏠 Home'],['restaurants','🍔 Restaurants'],['fitness','💪 Gym Meals'],['offers','🎉 Offers'],['profile','👤 Profile']].map(([p,l]) => (
+            <button key={p} onClick={() => { setPage(p); setMobileOpen(false); }} className="block w-full text-left py-3 text-gray-300 hover:text-white border-b border-white/5 last:border-0 font-medium">{l}</button>
+          ))}
+        </div>
+      )}
+    </nav>
+  );
+};
+
+// ═══════════════════════════════════════
+// BOTTOM NAV (Mobile)
+// ═══════════════════════════════════════
+
+const BottomNav = ({ page, setPage, cartCount }) => (
+  <div className="bottom-nav items-center justify-around px-2 py-3">
+    {[['home','Home','home'],['search','Search','search'],['cart','Cart','cart'],['profile','Profile','user']].map(([p,l,icon]) => (
+      <button key={p} onClick={() => setPage(p)} className={`flex flex-col items-center gap-1 px-3 relative ${page===p ? 'text-orange-500' : 'text-gray-500'}`}>
+        <Icon name={icon} size={22} />
+        {p === 'cart' && cartCount > 0 && <span className="notification-dot text-xs">{cartCount}</span>}
+        <span className="text-xs font-medium">{l}</span>
+      </button>
+    ))}
+  </div>
+);
+
+// ═══════════════════════════════════════
+// FOOD MODAL
+// ═══════════════════════════════════════
+
+const FoodModal = ({ food, onClose, onAdd }) => {
+  const [qty, setQty] = useState(1);
+  const [liked, setLiked] = useState(false);
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content glass border border-white/10 rounded-3xl w-full max-w-md mx-4" onClick={e => e.stopPropagation()}>
+        <div className="swipe-indicator mt-4" />
+        
+        {/* Food Emoji Hero */}
+        <div className={`mx-4 rounded-2xl bg-gradient-to-br ${food.dietType === 'veg' ? 'from-green-900/50 to-lime-900/50' : 'from-orange-900/50 to-red-900/50'} flex items-center justify-center text-8xl py-8`}>
+          {food.image}
+        </div>
+
+        <div className="p-5">
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <h3 className="font-display font-bold text-xl text-white">{food.name}</h3>
+              <p className="text-gray-400 text-sm mt-0.5">{food.restaurant}</p>
+            </div>
+            <button onClick={() => setLiked(!liked)} className={`p-2 rounded-xl transition-colors ${liked ? 'text-red-400' : 'text-gray-500'}`}>
+              <Icon name="heart" size={22} />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3 mb-4">
+            <StarRating rating={food.rating} />
+            <span className={`w-2 h-2 rounded-full ${food.dietType === 'veg' ? 'bg-lime-400' : 'bg-orange-400'}`} />
+            <span className="text-xs text-gray-400 capitalize">{food.dietType}</span>
+            {food.tags.map(t => <Badge key={t} text={t} type="lime" />)}
+          </div>
+
+          {/* Macros */}
+          <div className="glass rounded-2xl p-4 mb-4">
+            <p className="text-xs text-gray-400 font-semibold uppercase tracking-widest mb-3">Nutrition per serving</p>
+            <div className="grid grid-cols-4 gap-2 mb-4">
+              {[['🔥', food.calories, 'kcal'],['💪', food.protein+'g', 'Protein'],['🌾', food.carbs+'g', 'Carbs'],['🫙', food.fat+'g', 'Fat']].map(([e,v,l]) => (
+                <div key={l} className="text-center">
+                  <div className="text-lg mb-1">{e}</div>
+                  <div className="font-bold text-white text-sm">{v}</div>
+                  <div className="text-xs text-gray-500">{l}</div>
+                </div>
+              ))}
+            </div>
+            <div className="space-y-2">
+              <MacroBar label="Protein" value={food.protein} max={80} color="bg-blue-400" />
+              <MacroBar label="Carbs" value={food.carbs} max={150} color="bg-yellow-400" />
+              <MacroBar label="Fat" value={food.fat} max={50} color="bg-orange-400" />
+            </div>
+          </div>
+
+          {/* Qty + Add */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 glass rounded-2xl px-4 py-3">
+              <button onClick={() => setQty(Math.max(1, qty-1))} className="text-gray-400 hover:text-white transition-colors">
+                <Icon name="minus" size={18} />
+              </button>
+              <span className="font-bold text-white w-5 text-center">{qty}</span>
+              <button onClick={() => setQty(qty+1)} className="text-orange-400 hover:text-orange-300 transition-colors">
+                <Icon name="plus" size={18} />
+              </button>
+            </div>
+            <button onClick={() => { onAdd(food, qty); onClose(); }} className="btn-primary flex-1 py-3 rounded-2xl font-display font-bold text-base flex items-center justify-center gap-2">
+              Add to Cart — ₹{food.price * qty}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════
+// RESTAURANT CARD
+// ═══════════════════════════════════════
+
+const RestaurantCard = ({ r, onClick }) => (
+  <div onClick={onClick} className={`glass border border-white/5 rounded-2xl overflow-hidden card-hover cursor-pointer`}>
+    <div className={`h-40 bg-gradient-to-br ${r.bg} flex items-center justify-center text-7xl relative`}>
+      <span className="animate-float">{r.image}</span>
+      {r.badge && <div className="absolute top-3 left-3"><Badge text={r.badge} type={r.badge === 'Healthy Choice' || r.badge === 'Top Rated' ? 'lime' : 'orange'} /></div>}
+      {!r.isOpen && <div className="absolute inset-0 bg-black/60 flex items-center justify-center"><span className="bg-black/80 text-gray-400 text-sm px-4 py-2 rounded-full font-semibold">Currently Closed</span></div>}
+    </div>
+    <div className="p-4">
+      <div className="flex items-start justify-between mb-2">
+        <div>
+          <h3 className="font-display font-bold text-white text-base leading-tight">{r.name}</h3>
+          <p className="text-gray-400 text-xs mt-0.5">{r.cuisine}</p>
+        </div>
+        <StarRating rating={r.rating} />
+      </div>
+      <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+        <span className="flex items-center gap-1"><Icon name="clock" size={12} />{r.time}</span>
+        <span className="flex items-center gap-1"><Icon name="location" size={12} />{r.distance}</span>
+        <span>{r.price}</span>
+      </div>
+      {r.offers && (
+        <div className="flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 rounded-lg px-3 py-1.5">
+          <Icon name="tag" size={12} className="text-orange-400" />
+          <span className="text-xs text-orange-300 font-medium">{r.offers}</span>
+        </div>
+      )}
+    </div>
+  </div>
+);
+
+// ═══════════════════════════════════════
+// FOOD CARD
+// ═══════════════════════════════════════
+
+const FoodCard = ({ food, onOpen, onAdd }) => (
+  <div className="glass border border-white/5 rounded-2xl overflow-hidden card-hover">
+    <div className={`h-32 bg-gradient-to-br ${food.dietType === 'veg' ? 'from-green-900/40 to-lime-900/40' : food.dietType === 'vegan' ? 'from-teal-900/40 to-emerald-900/40' : 'from-orange-900/40 to-red-900/40'} flex items-center justify-center cursor-pointer`} onClick={() => onOpen(food)}>
+      <span className="text-6xl">{food.image}</span>
+    </div>
+    <div className="p-3">
+      <h4 className="font-display font-bold text-sm text-white leading-tight mb-1 cursor-pointer" onClick={() => onOpen(food)}>{food.name}</h4>
+      <p className="text-gray-500 text-xs mb-2">{food.restaurant}</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <span className="font-bold text-white">₹{food.price}</span>
+          {food.originalPrice > food.price && <span className="text-gray-500 text-xs line-through ml-1">₹{food.originalPrice}</span>}
+        </div>
+        <button onClick={() => onAdd(food, 1)} className="btn-primary w-8 h-8 rounded-xl flex items-center justify-center text-white">
+          <Icon name="plus" size={16} />
+        </button>
+      </div>
+      <div className="flex items-center gap-1 mt-2">
+        <StarRating rating={food.rating} />
+        <span className="text-gray-500 text-xs">· {food.calories} kcal · {food.protein}g protein</span>
+      </div>
+    </div>
+  </div>
+);
+
+// ═══════════════════════════════════════
+// HOME PAGE
+// ═══════════════════════════════════════
+
+const HomePage = ({ setPage, cart, setCart, setSelectedRestaurant, setSelectedFood }) => {
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [copiedCode, setCopiedCode] = useState(null);
+
+  const addToCart = (food, qty = 1) => {
+    setCart(prev => {
+      const existing = prev.find(i => i.id === food.id);
+      if (existing) return prev.map(i => i.id === food.id ? {...i, qty: i.qty + qty} : i);
+      return [...prev, {...food, qty}];
+    });
+  };
+
+  const copyCode = (code) => {
+    navigator.clipboard?.writeText(code).catch(() => {});
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
+  return (
+    <div className="min-h-screen" style={{paddingBottom: '100px'}}>
+      
+      {/* HERO */}
+      <section className="hero-gradient pt-28 pb-16 px-4 relative overflow-hidden">
+        {/* BG blobs */}
+        <div className="absolute top-20 right-10 w-64 h-64 rounded-full bg-orange-500/5 animate-blob" style={{animationDelay: '0s'}} />
+        <div className="absolute bottom-10 left-10 w-48 h-48 rounded-full bg-lime-500/5 animate-blob" style={{animationDelay: '3s'}} />
+        
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1 animate-fade-up">
+              <div className="section-label tag-orange mb-5">
+                <Icon name="zap" size={12} className="text-orange-400" />
+                Campus food delivery, redefined
+              </div>
+              <h1 className="font-display font-black text-5xl sm:text-6xl lg:text-7xl leading-none mb-5">
+                Fuel your<br />
+                <span className="gradient-text">grind</span>,<br />
+                feed the <span className="text-orange-400">beast</span>.
+              </h1>
+              <p className="text-gray-400 text-lg leading-relaxed mb-8 max-w-lg">
+                Premium meals for college warriors, gym beasts, and hostel survivors. Fast. Cheap. Protein-packed. Delivered.
+              </p>
+              
+              {/* Search Bar */}
+              <div className="flex gap-3 max-w-xl">
+                <div className="flex-1 glass border border-white/10 rounded-2xl flex items-center gap-3 px-4 py-3">
+                  <Icon name="location" size={18} className="text-orange-400 shrink-0" />
+                  <input className="bg-transparent flex-1 text-white placeholder-gray-500 outline-none text-sm" placeholder="Your hostel, campus, or gym..." />
+                </div>
+                <button onClick={() => setPage('restaurants')} className="btn-primary px-6 py-3 rounded-2xl font-display font-bold flex items-center gap-2">
+                  <Icon name="search" size={18} />
+                  <span className="hidden sm:inline">Find Food</span>
+                </button>
+              </div>
+
+              {/* Stats */}
+              <div className="flex gap-8 mt-8">
+                {[['50+','Restaurants'],['8k+','Orders/day'],['15 min','Avg delivery']].map(([v,l]) => (
+                  <div key={l}>
+                    <div className="font-display font-black text-2xl text-white">{v}</div>
+                    <div className="text-xs text-gray-500">{l}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Hero Illustration */}
+            <div className="flex-1 hidden lg:flex items-center justify-center animate-fade-in delay-300">
+              <div className="relative">
+                <div className="w-80 h-80 rounded-full gradient-orange opacity-10 animate-spin-slow absolute inset-0 m-auto" />
+                <div className="glass border border-white/10 rounded-3xl p-8 text-center animate-float">
+                  <div className="text-9xl mb-4">🍱</div>
+                  <div className="font-display font-black text-white text-xl">Order in 30s</div>
+                  <div className="text-gray-400 text-sm mt-1">Track in real-time</div>
+                  <div className="mt-4 flex items-center justify-center gap-2">
+                    <div className="order-status-dot bg-lime-400" />
+                    <span className="text-lime-400 text-sm font-semibold">Delivering now</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* MARQUEE */}
+      <div className="bg-orange-500/5 border-y border-orange-500/10 py-3 overflow-hidden">
+        <div className="flex animate-marquee whitespace-nowrap">
+          {['🎓 Student Special 20% Off','💪 Free Protein Shake Today','🌙 Midnight Deals After 10PM','⚡ Express 15-Min Delivery','🏆 Top Rated Campus Meals','🌱 Vegan Options Available'].concat(['🎓 Student Special 20% Off','💪 Free Protein Shake Today','🌙 Midnight Deals After 10PM','⚡ Express 15-Min Delivery','🏆 Top Rated Campus Meals','🌱 Vegan Options Available']).map((t,i) => (
+            <span key={i} className="text-orange-300/70 text-sm font-medium mx-8">{t}</span>
+          ))}
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        
+        {/* CATEGORIES */}
+        <section className="py-12">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="font-display font-black text-2xl text-white">Browse by Category</h2>
+              <p className="text-gray-500 text-sm mt-1">What are you craving today?</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
+            {CATEGORIES.map(cat => (
+              <button key={cat.id} onClick={() => { setActiveCategory(cat.id === activeCategory ? null : cat.id); setPage('restaurants'); }} className={`flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all ${activeCategory === cat.id ? 'border-orange-500/50 bg-orange-500/10' : 'border-white/5 bg-white/2 hover:border-white/10 hover:bg-white/5'}`}>
+                <span className="text-3xl">{cat.icon}</span>
+                <span className="text-xs font-medium text-gray-300 text-center leading-tight">{cat.name}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* OFFERS */}
+        <section className="py-4">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="font-display font-black text-2xl text-white">Hot Deals 🔥</h2>
+              <p className="text-gray-500 text-sm mt-1">Limited time, unlimited cravings</p>
+            </div>
+            <button onClick={() => setPage('offers')} className="text-orange-400 text-sm font-semibold flex items-center gap-1 hover:text-orange-300">View all <Icon name="arrow_right" size={14} /></button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {OFFERS.map(offer => (
+              <div key={offer.id} className={`bg-gradient-to-br ${offer.color} rounded-2xl p-5 relative overflow-hidden group card-hover`}>
+                <div className="absolute -right-4 -top-4 text-6xl opacity-20 group-hover:opacity-30 transition-opacity">{offer.icon}</div>
+                <div className="text-3xl mb-3">{offer.icon}</div>
+                <h3 className="font-display font-black text-white text-lg mb-1">{offer.title}</h3>
+                <p className="text-white/70 text-xs mb-4 leading-relaxed">{offer.desc}</p>
+                <button onClick={() => copyCode(offer.code)} className="flex items-center gap-2 bg-black/30 hover:bg-black/40 border border-white/20 rounded-xl px-3 py-2 transition-colors">
+                  <span className="font-bold text-white text-sm tracking-widest">{offer.code}</span>
+                  <Icon name={copiedCode === offer.code ? "check" : "copy"} size={14} className={copiedCode === offer.code ? "text-lime-400" : "text-white/60"} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* FEATURED RESTAURANTS */}
+        <section className="py-12">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="font-display font-black text-2xl text-white">Featured Spots</h2>
+              <p className="text-gray-500 text-sm mt-1">Curated for campus life</p>
+            </div>
+            <button onClick={() => setPage('restaurants')} className="text-orange-400 text-sm font-semibold flex items-center gap-1 hover:text-orange-300">See all <Icon name="arrow_right" size={14} /></button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {RESTAURANTS.filter(r => r.featured).map(r => (
+              <RestaurantCard key={r.id} r={r} onClick={() => { setSelectedRestaurant(r); setPage('restaurant-detail'); }} />
+            ))}
+          </div>
+        </section>
+
+        {/* TRENDING FOODS */}
+        <section className="py-4">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="font-display font-black text-2xl text-white">Trending Now 🌶️</h2>
+              <p className="text-gray-500 text-sm mt-1">What everyone's ordering</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {FOODS.filter(f => f.popular).map(food => (
+              <FoodCard key={food.id} food={food} onOpen={setSelectedFood} onAdd={addToCart} />
+            ))}
+          </div>
+        </section>
+
+        {/* GYM MEALS */}
+        <section className="py-12">
+          <div className="glass border border-white/5 rounded-3xl p-8 relative overflow-hidden">
+            <div className="absolute -right-20 -top-20 w-64 h-64 rounded-full bg-lime-500/5" />
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <div className="section-label tag-lime mb-3">
+                  <Icon name="fire" size={12} className="text-lime-400" />
+                  Macro Tracked Meals
+                </div>
+                <h2 className="font-display font-black text-3xl text-white">Gym Warrior Meals</h2>
+                <p className="text-gray-400 mt-2">Scientifically crafted for your fitness goals</p>
+              </div>
+              <button onClick={() => setPage('fitness')} className="hidden sm:flex items-center gap-2 btn-secondary px-5 py-2.5 rounded-xl font-semibold text-sm">
+                View All Plans <Icon name="arrow_right" size={16} />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {FITNESS_MEALS.slice(0,3).map(meal => (
+                <div key={meal.id} className="glass border border-white/5 rounded-2xl overflow-hidden card-hover cursor-pointer" onClick={() => setPage('fitness')}>
+                  <div className={`bg-gradient-to-r ${meal.color} p-6 flex items-center gap-4`}>
+                    <span className="text-5xl">{meal.image}</span>
+                    <div>
+                      <span className="text-white/70 text-xs font-semibold uppercase tracking-widest">{meal.goal}</span>
+                      <h3 className="font-display font-black text-white text-lg leading-tight">{meal.name}</h3>
+                      <p className="text-white/60 text-xs mt-1">{meal.desc}</p>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="grid grid-cols-4 gap-2 mb-4">
+                      {[['🔥',meal.calories,'kcal'],['💪',meal.protein+'g','prot'],['🌾',meal.carbs+'g','carbs'],['🫙',meal.fat+'g','fat']].map(([e,v,l]) => (
+                        <div key={l} className="text-center">
+                          <div className="text-sm">{e}</div>
+                          <div className="font-bold text-white text-xs">{v}</div>
+                          <div className="text-gray-500" style={{fontSize:'10px'}}>{l}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-display font-black text-xl text-white">₹{meal.price}</span>
+                      <button onClick={e => { e.stopPropagation(); addToCart({...meal, id: `fm-${meal.id}`, image: meal.image, dietType: 'non-veg', rating: 4.8, restaurant: 'Muscle Meal Co.'}, 1); }} className="btn-primary px-4 py-2 rounded-xl text-sm font-bold">
+                        Add +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* TESTIMONIALS */}
+        <section className="py-12">
+          <div className="text-center mb-8">
+            <div className="section-label tag-orange mb-3 mx-auto w-fit">
+              <Icon name="star" size={12} className="text-orange-400" />
+              Real Students, Real Results
+            </div>
+            <h2 className="font-display font-black text-3xl text-white">Campus Loves ZAAVO</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {TESTIMONIALS.map((t, i) => (
+              <div key={i} className="glass border border-white/5 rounded-2xl p-5 card-hover">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl gradient-orange flex items-center justify-center font-bold text-white text-sm">{t.avatar}</div>
+                  <div>
+                    <div className="font-semibold text-white text-sm">{t.name}</div>
+                    <div className="text-gray-500 text-xs">{t.role}</div>
+                  </div>
+                </div>
+                <div className="flex mb-3">
+                  {[...Array(t.rating)].map((_,i) => <Icon key={i} name="star" size={13} className="star-filled" />)}
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">"{t.text}"</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* SUBSCRIPTION CTA */}
+        <section className="py-12">
+          <div className="relative bg-gradient-to-r from-orange-600 to-red-600 rounded-3xl p-8 sm:p-12 overflow-hidden">
+            <div className="absolute -right-16 -bottom-16 text-[200px] opacity-10">💪</div>
+            <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div>
+                <h2 className="font-display font-black text-3xl sm:text-4xl text-white mb-2">Go Pro. Eat Better.</h2>
+                <p className="text-orange-100 text-lg">Monthly meal plans crafted for your fitness goals. Starting ₹999/month.</p>
+              </div>
+              <button onClick={() => setPage('subscription')} className="bg-white text-orange-600 font-display font-black px-8 py-4 rounded-2xl text-lg hover:bg-orange-50 transition-colors whitespace-nowrap">
+                Start Subscription →
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* APP DOWNLOAD */}
+        <section className="py-12">
+          <div className="glass border border-white/5 rounded-3xl p-8 flex flex-col sm:flex-row items-center gap-8">
+            <div className="flex-1">
+              <h2 className="font-display font-black text-3xl text-white mb-3">Get the ZAAVO App</h2>
+              <p className="text-gray-400 mb-6">Order faster. Track live. Never miss a deal. Available on iOS & Android.</p>
+              <div className="flex gap-3">
+                <button className="flex items-center gap-3 glass border border-white/10 rounded-2xl px-5 py-3 hover:border-white/20 transition-colors">
+                  <span className="text-2xl">🍎</span>
+                  <div className="text-left">
+                    <div className="text-gray-400 text-xs">Download on the</div>
+                    <div className="font-bold text-white">App Store</div>
+                  </div>
+                </button>
+                <button className="flex items-center gap-3 glass border border-white/10 rounded-2xl px-5 py-3 hover:border-white/20 transition-colors">
+                  <span className="text-2xl">🤖</span>
+                  <div className="text-left">
+                    <div className="text-gray-400 text-xs">Get it on</div>
+                    <div className="font-bold text-white">Google Play</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+            <div className="text-8xl animate-float">📱</div>
+          </div>
+        </section>
+      </div>
+
+      {/* FOOTER */}
+      <footer className="border-t border-white/5 py-12 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-xl gradient-orange flex items-center justify-center font-display font-black text-white">Z</div>
+                <span className="font-display font-black text-xl">ZAAVO</span>
+              </div>
+              <p className="text-gray-500 text-sm leading-relaxed">Campus food & fitness delivery for the next generation.</p>
+            </div>
+            {[['Company',['About Us','Careers','Blog','Press']],['For Users',['How it Works','Become Partner','Gift Cards','Referrals']],['Legal',['Privacy Policy','Terms of Use','Cookie Policy','Licenses']]].map(([title, links]) => (
+              <div key={title}>
+                <h4 className="font-display font-bold text-white mb-3">{title}</h4>
+                <ul className="space-y-2">
+                  {links.map(l => <li key={l}><a href="#" className="text-gray-500 text-sm hover:text-white transition-colors">{l}</a></li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-gray-600 text-sm">© 2025 ZAAVO. All rights reserved. Made for campus warriors.</p>
+            <div className="flex items-center gap-4 text-gray-600 text-sm">
+              <span className="flex items-center gap-1"><Icon name="shield" size={14} />Secure Payments</span>
+              <span className="flex items-center gap-1"><Icon name="zap" size={14} />Fast Delivery</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════
+// RESTAURANTS PAGE
+// ═══════════════════════════════════════
+
+const RestaurantsPage = ({ setPage, setSelectedRestaurant }) => {
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('All');
+  const filters = ['All','Veg Only','Budget','Fitness','Open Now','Top Rated'];
+  const filtered = RESTAURANTS.filter(r => {
+    const matchSearch = r.name.toLowerCase().includes(search.toLowerCase()) || r.cuisine.toLowerCase().includes(search.toLowerCase());
+    const matchFilter = filter === 'All' || (filter === 'Open Now' && r.isOpen) || (filter === 'Top Rated' && r.rating >= 4.7) || (filter === 'Budget' && r.price === '₹') || (filter === 'Fitness' && r.cuisine.includes('Fitness'));
+    return matchSearch && matchFilter;
+  });
+
+  return (
+    <div className="min-h-screen pt-24 pb-24 px-4">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="font-display font-black text-4xl text-white mb-2">All Restaurants</h1>
+        <p className="text-gray-400 mb-6">{RESTAURANTS.length} restaurants near your campus</p>
+        
+        {/* Search */}
+        <div className="flex gap-3 mb-6">
+          <div className="flex-1 glass border border-white/10 rounded-2xl flex items-center gap-3 px-4 py-3">
+            <Icon name="search" size={18} className="text-gray-500" />
+            <input value={search} onChange={e => setSearch(e.target.value)} className="bg-transparent flex-1 text-white placeholder-gray-500 outline-none" placeholder="Search restaurants or cuisine..." />
+          </div>
+          <button className="glass border border-white/10 rounded-2xl px-4 flex items-center gap-2 text-gray-400 hover:text-white hover:border-white/20 transition-colors">
+            <Icon name="filter" size={18} />
+            <span className="hidden sm:inline text-sm font-medium">Filter</span>
+          </button>
+        </div>
+
+        {/* Filters */}
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-8" style={{scrollbarWidth:'none'}}>
+          {filters.map(f => (
+            <button key={f} onClick={() => setFilter(f)} className={`cuisine-chip px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${filter === f ? 'active' : ''}`}>{f}</button>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {filtered.map(r => (
+            <RestaurantCard key={r.id} r={r} onClick={() => { setSelectedRestaurant(r); setPage('restaurant-detail'); }} />
+          ))}
+        </div>
+        {filtered.length === 0 && (
+          <div className="text-center py-20">
+            <div className="text-6xl mb-4">🔍</div>
+            <p className="text-gray-400 text-lg">No restaurants found</p>
+            <button onClick={() => { setSearch(''); setFilter('All'); }} className="btn-primary px-6 py-3 rounded-xl mt-4 font-semibold">Reset Filters</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════
+// RESTAURANT DETAIL PAGE
+// ═══════════════════════════════════════
+
+const RestaurantDetailPage = ({ restaurant, setCart, setSelectedFood }) => {
+  const [activeTab, setActiveTab] = useState('Menu');
+  const tabs = ['Menu','Reviews','Info'];
+
+  const addToCart = (food, qty = 1) => {
+    setCart(prev => {
+      const existing = prev.find(i => i.id === food.id);
+      if (existing) return prev.map(i => i.id === food.id ? {...i, qty: i.qty + qty} : i);
+      return [...prev, {...food, qty}];
+    });
+  };
+
+  if (!restaurant) return <div className="pt-24 text-center text-gray-400">Select a restaurant first</div>;
+
+  const restaurantFoods = FOODS.filter(f => f.restaurant === restaurant.name);
+
+  return (
+    <div className="min-h-screen pb-24">
+      {/* Hero */}
+      <div className={`pt-20 pb-8 bg-gradient-to-br ${restaurant.bg}`}>
+        <div className="max-w-5xl mx-auto px-4 pt-8">
+          <div className="flex items-end gap-6">
+            <div className="w-24 h-24 glass border border-white/10 rounded-3xl flex items-center justify-center text-6xl animate-float">{restaurant.image}</div>
+            <div className="flex-1 pb-2">
+              <div className="flex items-center gap-2 mb-1">
+                {restaurant.badge && <Badge text={restaurant.badge} type="lime" />}
+                <span className={`text-sm font-semibold ${restaurant.isOpen ? 'text-lime-400' : 'text-red-400'}`}>{restaurant.isOpen ? '● Open' : '● Closed'}</span>
+              </div>
+              <h1 className="font-display font-black text-3xl text-white">{restaurant.name}</h1>
+              <p className="text-gray-300 text-sm mt-1">{restaurant.cuisine}</p>
+              <div className="flex items-center gap-4 mt-2 text-gray-300 text-sm">
+                <StarRating rating={restaurant.rating} />
+                <span>({restaurant.reviews} reviews)</span>
+                <span><Icon name="clock" size={13} className="inline mr-1" />{restaurant.time}</span>
+                <span><Icon name="location" size={13} className="inline mr-1" />{restaurant.distance}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4">
+        {/* Tabs */}
+        <div className="flex gap-1 border-b border-white/5 mb-8 mt-4">
+          {tabs.map(t => (
+            <button key={t} onClick={() => setActiveTab(t)} className={`px-6 py-3 font-semibold text-sm transition-all border-b-2 ${activeTab===t ? 'border-orange-500 text-white' : 'border-transparent text-gray-500 hover:text-white'}`}>{t}</button>
+          ))}
+        </div>
+
+        {activeTab === 'Menu' && (
+          <div>
+            {restaurant.offers && (
+              <div className="flex items-center gap-2 bg-orange-500/10 border border-orange-500/20 rounded-2xl px-4 py-3 mb-6">
+                <Icon name="tag" size={16} className="text-orange-400" />
+                <span className="text-orange-300 font-medium">{restaurant.offers}</span>
+              </div>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {(restaurantFoods.length > 0 ? restaurantFoods : FOODS.slice(0,6)).map(food => (
+                <FoodCard key={food.id} food={food} onOpen={setSelectedFood} onAdd={addToCart} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'Reviews' && (
+          <div className="space-y-4">
+            {TESTIMONIALS.map((t,i) => (
+              <div key={i} className="glass border border-white/5 rounded-2xl p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-xl gradient-orange flex items-center justify-center font-bold text-white text-sm">{t.avatar}</div>
+                  <div>
+                    <div className="font-semibold text-white">{t.name}</div>
+                    <div className="flex mt-0.5">{[...Array(t.rating)].map((_,i) => <Icon key={i} name="star" size={12} className="star-filled" />)}</div>
+                  </div>
+                </div>
+                <p className="text-gray-300 text-sm">"{t.text}"</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'Info' && (
+          <div className="grid sm:grid-cols-2 gap-4">
+            {[['📍 Address','Block 7, Campus Road, Near Main Gate'],['⏰ Hours','Mon–Fri: 8AM–11PM, Sat–Sun: 9AM–12AM'],['📞 Contact','+91 98765 43210'],['💳 Payment','UPI, Card, Cash on Delivery, ZAAVO Wallet'],['🚴 Delivery','Free above ₹199, ₹30 below'],['⭐ Rating',`${restaurant.rating}/5 (${restaurant.reviews} reviews)`]].map(([l,v]) => (
+              <div key={l} className="glass border border-white/5 rounded-2xl p-4">
+                <div className="text-gray-400 text-xs mb-1">{l.split(' ')[0]} {l.split(' ').slice(1).join(' ')}</div>
+                <div className="text-white font-medium text-sm">{v}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════
+// FITNESS PAGE
+// ═══════════════════════════════════════
+
+const FitnessPage = ({ setCart }) => {
+  const [goal, setGoal] = useState('All');
+  const goals = ['All','Bulking','Cutting','Weight Loss','High Protein','Vegan','Keto'];
+  const filtered = goal === 'All' ? FITNESS_MEALS : FITNESS_MEALS.filter(m => m.goal === goal);
+
+  const addToCart = (meal) => {
+    setCart(prev => {
+      const existing = prev.find(i => i.id === `fm-${meal.id}`);
+      if (existing) return prev.map(i => i.id === `fm-${meal.id}` ? {...i, qty: i.qty + 1} : i);
+      return [...prev, {...meal, id: `fm-${meal.id}`, qty: 1, dietType: 'non-veg', rating: 4.8, restaurant: 'Muscle Meal Co.'}];
+    });
+  };
+
+  return (
+    <div className="min-h-screen pt-24 pb-24 px-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="section-label tag-lime mb-4 mx-auto w-fit">
+            <Icon name="fire" size={12} className="text-lime-400" />
+            Science-backed nutrition
+          </div>
+          <h1 className="font-display font-black text-5xl text-white mb-3">Gym Warrior <span className="gradient-text">Meal Plans</span></h1>
+          <p className="text-gray-400 text-lg max-w-xl mx-auto">Every meal macro-tracked, chef-crafted, and optimized for your specific fitness goal.</p>
+        </div>
+
+        {/* Goal Filter */}
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-10 justify-center" style={{scrollbarWidth:'none'}}>
+          {goals.map(g => (
+            <button key={g} onClick={() => setGoal(g)} className={`px-5 py-2.5 rounded-2xl text-sm font-bold whitespace-nowrap transition-all ${goal===g ? 'bg-lime-500/20 border border-lime-500/50 text-lime-300' : 'glass border border-white/5 text-gray-400 hover:text-white'}`}>{g}</button>
+          ))}
+        </div>
+
+        {/* Meals Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+          {filtered.map(meal => (
+            <div key={meal.id} className="glass border border-white/5 rounded-3xl overflow-hidden card-hover">
+              <div className={`bg-gradient-to-r ${meal.color} p-8 flex flex-col items-center text-center`}>
+                <span className="text-7xl mb-3 animate-float">{meal.image}</span>
+                <span className="bg-white/20 text-white text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-2">{meal.goal}</span>
+                <h3 className="font-display font-black text-white text-2xl">{meal.name}</h3>
+                <p className="text-white/70 text-sm mt-1">{meal.desc}</p>
+              </div>
+              <div className="p-5">
+                {/* Macro bars */}
+                <div className="space-y-3 mb-5">
+                  <MacroBar label="Protein" value={meal.protein} max={80} color="bg-blue-400" />
+                  <MacroBar label="Carbs" value={meal.carbs} max={200} color="bg-yellow-400" />
+                  <MacroBar label="Fat" value={meal.fat} max={50} color="bg-orange-400" />
+                </div>
+                {/* Macro grid */}
+                <div className="grid grid-cols-4 gap-2 mb-5">
+                  {[['🔥',meal.calories,'kcal'],['💪',meal.protein+'g','protein'],['🌾',meal.carbs+'g','carbs'],['🫙',meal.fat+'g','fat']].map(([e,v,l]) => (
+                    <div key={l} className="text-center glass rounded-xl p-2">
+                      <div className="text-lg">{e}</div>
+                      <div className="font-bold text-white text-xs">{v}</div>
+                      <div className="text-gray-500" style={{fontSize:'10px'}}>{l}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-display font-black text-2xl text-white">₹{meal.price}</span>
+                    <div className="text-gray-500 text-xs">per serving</div>
+                  </div>
+                  <button onClick={() => addToCart(meal)} className="btn-primary px-6 py-3 rounded-2xl font-display font-bold flex items-center gap-2">
+                    <Icon name="plus" size={16} />
+                    Add
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Subscription Plans */}
+        <div className="mb-8 text-center">
+          <h2 className="font-display font-black text-3xl text-white mb-2">Subscription Plans</h2>
+          <p className="text-gray-400">Lock in your macros. Save big. Stay consistent.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {SUBSCRIPTION_PLANS.map(plan => (
+            <div key={plan.name} className={`relative bg-gradient-to-br ${plan.color} rounded-3xl p-6 border border-white/10 ${plan.badge === 'Most Popular' ? 'scale-105 shadow-2xl shadow-orange-500/20' : ''}`}>
+              {plan.badge && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <span className={`px-4 py-1 rounded-full text-xs font-bold ${plan.badge === 'Most Popular' ? 'bg-orange-500 text-white' : 'bg-lime-500 text-black'}`}>{plan.badge}</span>
+                </div>
+              )}
+              <h3 className="font-display font-black text-2xl text-white mb-1">{plan.name}</h3>
+              <div className="mb-4">
+                <span className="font-black text-4xl text-white">₹{plan.price}</span>
+                <span className="text-gray-300 text-sm">/{plan.period}</span>
+              </div>
+              <div className="text-orange-200 text-sm mb-5">{plan.meals} meals/month · Save {plan.discount}</div>
+              <ul className="space-y-2 mb-6">
+                {plan.features.map(f => (
+                  <li key={f} className="flex items-center gap-2 text-gray-200 text-sm">
+                    <Icon name="check" size={15} className="text-lime-400 shrink-0" />{f}
+                  </li>
+                ))}
+              </ul>
+              <button className={`w-full py-3 rounded-2xl font-display font-bold text-base ${plan.badge === 'Most Popular' ? 'btn-primary' : 'btn-secondary'}`}>
+                Choose {plan.name}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════
+// CART PAGE
+// ═══════════════════════════════════════
+
+const CartPage = ({ cart, setCart, setPage }) => {
+  const [coupon, setCoupon] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [couponMsg, setCouponMsg] = useState('');
+  const [address, setAddress] = useState('Hostel Block 7, Room 312, Campus Road');
+  const [payMethod, setPayMethod] = useState('UPI');
+
+  const updateQty = (id, delta) => {
+    setCart(prev => prev.map(i => i.id === id ? {...i, qty: Math.max(0, i.qty + delta)} : i).filter(i => i.qty > 0));
+  };
+
+  const remove = (id) => setCart(prev => prev.filter(i => i.id !== id));
+
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const delivery = subtotal >= 199 ? 0 : 30;
+  const total = subtotal + delivery - discount;
+
+  const applyCoupon = () => {
+    const codes = { 'CAMPUS20': Math.round(subtotal * 0.2), 'ZAAVO100': 100, 'GYMPOWER': 50, 'NIGHT50': Math.round(subtotal * 0.5) };
+    if (codes[coupon.toUpperCase()]) {
+      setDiscount(codes[coupon.toUpperCase()]);
+      setCouponMsg(`✓ Saved ₹${codes[coupon.toUpperCase()]}!`);
+    } else {
+      setCouponMsg('✗ Invalid code');
+      setDiscount(0);
+    }
+  };
+
+  if (cart.length === 0) return (
+    <div className="min-h-screen pt-24 pb-24 flex items-center justify-center px-4">
+      <div className="text-center animate-fade-up">
+        <div className="text-8xl mb-6 animate-float">🛒</div>
+        <h2 className="font-display font-black text-3xl text-white mb-3">Your cart is empty!</h2>
+        <p className="text-gray-400 mb-8">Time to fuel up. Add some meals to get started.</p>
+        <button onClick={() => setPage('restaurants')} className="btn-primary px-8 py-4 rounded-2xl font-display font-bold text-lg">Browse Restaurants</button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen pt-24 pb-24 px-4">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="font-display font-black text-3xl text-white mb-8">Your Cart ({cart.length} items)</h1>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Cart Items */}
+          <div className="lg:col-span-2 space-y-3">
+            {cart.map(item => (
+              <div key={item.id} className="glass border border-white/5 rounded-2xl p-4 flex items-center gap-4">
+                <div className="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center text-4xl shrink-0">{item.image}</div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-white text-sm leading-tight truncate">{item.name}</h4>
+                  <p className="text-gray-500 text-xs mt-0.5">{item.restaurant}</p>
+                  <p className="text-orange-400 font-bold mt-1">₹{item.price * item.qty}</p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button onClick={() => updateQty(item.id, -1)} className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-gray-400 hover:text-white">
+                    <Icon name="minus" size={14} />
+                  </button>
+                  <span className="font-bold text-white w-5 text-center">{item.qty}</span>
+                  <button onClick={() => updateQty(item.id, 1)} className="w-8 h-8 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400 hover:text-orange-300">
+                    <Icon name="plus" size={14} />
+                  </button>
+                  <button onClick={() => remove(item.id)} className="w-8 h-8 rounded-xl hover:bg-red-500/10 flex items-center justify-center text-gray-500 hover:text-red-400 ml-2">
+                    <Icon name="x" size={16} />
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {/* Delivery Address */}
+            <div className="glass border border-white/5 rounded-2xl p-4 mt-2">
+              <h3 className="font-semibold text-white mb-3 flex items-center gap-2"><Icon name="location" size={16} className="text-orange-400" />Delivery Address</h3>
+              <input value={address} onChange={e => setAddress(e.target.value)} className="input-field w-full rounded-xl px-4 py-3 text-sm" />
+            </div>
+
+            {/* Payment */}
+            <div className="glass border border-white/5 rounded-2xl p-4">
+              <h3 className="font-semibold text-white mb-3">Payment Method</h3>
+              <div className="grid grid-cols-3 gap-2">
+                {['UPI','Card','Cash'].map(m => (
+                  <button key={m} onClick={() => setPayMethod(m)} className={`py-3 rounded-xl text-sm font-semibold transition-all ${payMethod===m ? 'bg-orange-500 text-white' : 'glass border border-white/5 text-gray-400 hover:text-white'}`}>{m}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Order Summary */}
+          <div className="space-y-4">
+            {/* Coupon */}
+            <div className="glass border border-white/5 rounded-2xl p-4">
+              <h3 className="font-semibold text-white mb-3 flex items-center gap-2"><Icon name="tag" size={16} className="text-orange-400" />Apply Coupon</h3>
+              <div className="flex gap-2">
+                <input value={coupon} onChange={e => setCoupon(e.target.value)} placeholder="Enter code..." className="input-field flex-1 rounded-xl px-3 py-2.5 text-sm" />
+                <button onClick={applyCoupon} className="btn-primary px-4 py-2.5 rounded-xl text-sm font-bold">Apply</button>
+              </div>
+              {couponMsg && <p className={`text-xs mt-2 font-semibold ${couponMsg.startsWith('✓') ? 'text-lime-400' : 'text-red-400'}`}>{couponMsg}</p>}
+              <div className="mt-3 flex flex-wrap gap-1">
+                {['CAMPUS20','ZAAVO100','GYMPOWER'].map(code => (
+                  <button key={code} onClick={() => { setCoupon(code); }} className="text-xs tag-orange px-2 py-1 rounded-lg">{code}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Bill */}
+            <div className="glass border border-white/5 rounded-2xl p-4">
+              <h3 className="font-semibold text-white mb-4">Order Summary</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between text-gray-400"><span>Subtotal</span><span>₹{subtotal}</span></div>
+                <div className="flex justify-between text-gray-400"><span>Delivery</span><span className={delivery === 0 ? 'text-lime-400' : ''}>{delivery === 0 ? 'FREE' : `₹${delivery}`}</span></div>
+                {discount > 0 && <div className="flex justify-between text-lime-400"><span>Discount</span><span>-₹{discount}</span></div>}
+                <div className="border-t border-white/5 pt-2 flex justify-between font-display font-bold text-white text-lg">
+                  <span>Total</span><span>₹{total}</span>
+                </div>
+              </div>
+              <button onClick={() => setPage('order-tracking')} className="btn-primary w-full py-4 rounded-2xl font-display font-bold text-lg mt-4">
+                Place Order — ₹{total}
+              </button>
+              <div className="flex items-center justify-center gap-2 mt-3 text-gray-500 text-xs">
+                <Icon name="shield" size={13} />
+                <span>Secure checkout via {payMethod}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════
+// ORDER TRACKING PAGE
+// ═══════════════════════════════════════
+
+const OrderTrackingPage = ({ setCart }) => {
+  const [step, setStep] = useState(0);
+  const steps = ['Order Placed','Restaurant Accepted','Being Prepared','Out for Delivery','Delivered'];
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStep(s => s < steps.length - 1 ? s + 1 : s);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  const emojis = ['📋','✅','👨‍🍳','🛵','🎉'];
+
+  return (
+    <div className="min-h-screen pt-24 pb-24 px-4 flex items-center justify-center">
+      <div className="max-w-md w-full">
+        <div className="text-center mb-10">
+          <div className="text-7xl mb-4 animate-float">{emojis[step]}</div>
+          <h1 className="font-display font-black text-3xl text-white mb-2">Order #ZAV-{8900 + Math.floor(Math.random()*99)}</h1>
+          <p className="text-gray-400">Estimated arrival: <span className="text-orange-400 font-bold">20–30 min</span></p>
+        </div>
+
+        {/* Progress */}
+        <div className="glass border border-white/5 rounded-3xl p-6 mb-6">
+          <div className="space-y-4">
+            {steps.map((s, i) => (
+              <div key={s} className="flex items-center gap-4">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 ${i <= step ? 'bg-orange-500 text-white' : 'bg-white/5 text-gray-600'}`}>
+                  {i < step ? <Icon name="check" size={18} /> : <span className="text-sm font-bold">{i+1}</span>}
+                </div>
+                <div className="flex-1">
+                  <div className={`font-semibold text-sm transition-colors ${i <= step ? 'text-white' : 'text-gray-500'}`}>{s}</div>
+                  {i === step && <div className="text-orange-400 text-xs mt-0.5 flex items-center gap-1"><div className="order-status-dot bg-orange-400 w-2 h-2" />In progress...</div>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Delivery info */}
+        <div className="glass border border-white/5 rounded-2xl p-4 mb-6 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl gradient-orange flex items-center justify-center">
+            <Icon name="bike" size={22} className="text-white" />
+          </div>
+          <div>
+            <div className="font-semibold text-white">Rahul Kumar</div>
+            <div className="text-gray-400 text-sm">Delivery Partner · ⭐ 4.9</div>
+          </div>
+          <button className="ml-auto glass border border-white/10 rounded-xl p-2.5 text-gray-400 hover:text-white">
+            <Icon name="phone" size={18} />
+          </button>
+        </div>
+
+        {step === steps.length - 1 && (
+          <button onClick={() => setCart([])} className="btn-primary w-full py-4 rounded-2xl font-display font-bold text-lg animate-fade-up">
+            🎉 Order Complete! Rate & Review
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════
+// PROFILE PAGE
+// ═══════════════════════════════════════
+
+const ProfilePage = ({ setPage, setIsLoggedIn }) => {
+  const [activeTab, setActiveTab] = useState('Orders');
+  const tabs = ['Orders','Wishlist','Addresses','Subscription'];
+
+  return (
+    <div className="min-h-screen pt-24 pb-24 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Profile Header */}
+        <div className="glass border border-white/5 rounded-3xl p-6 mb-6 flex items-center gap-5">
+          <div className="w-20 h-20 rounded-2xl gradient-orange flex items-center justify-center font-display font-black text-3xl text-white">RS</div>
+          <div className="flex-1">
+            <h2 className="font-display font-black text-2xl text-white">Rohan Sharma</h2>
+            <p className="text-gray-400">rohan.sharma@iitd.ac.in</p>
+            <div className="flex gap-3 mt-2">
+              <Badge text="Pro Athlete Plan" type="lime" />
+              <Badge text="⭐ 1,240 Points" type="orange" />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button className="glass border border-white/10 rounded-xl p-2.5 text-gray-400 hover:text-white"><Icon name="settings" size={18} /></button>
+            <button onClick={() => { setIsLoggedIn(false); setPage('home'); }} className="glass border border-white/10 rounded-xl p-2.5 text-gray-400 hover:text-red-400">
+              <Icon name="logout" size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          {[['47','Total Orders'],['₹12.4k','Spent'],['8.2k','Calories Saved']].map(([v,l]) => (
+            <div key={l} className="glass border border-white/5 rounded-2xl p-4 text-center">
+              <div className="font-display font-black text-2xl text-white">{v}</div>
+              <div className="text-gray-500 text-xs mt-1">{l}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-1 border-b border-white/5 mb-6">
+          {tabs.map(t => (
+            <button key={t} onClick={() => setActiveTab(t)} className={`px-5 py-3 font-semibold text-sm transition-all border-b-2 ${activeTab===t ? 'border-orange-500 text-white' : 'border-transparent text-gray-500 hover:text-white'}`}>{t}</button>
+          ))}
+        </div>
+
+        {activeTab === 'Orders' && (
+          <div className="space-y-4">
+            {ORDERS_HISTORY.map(order => (
+              <div key={order.id} className="glass border border-white/5 rounded-2xl p-4 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-2xl">🍱</div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-semibold text-white text-sm">{order.restaurant}</span>
+                    <span className={`text-xs font-bold ${order.statusColor}`}>{order.status}</span>
+                  </div>
+                  <p className="text-gray-500 text-xs">{order.items.join(', ')}</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-gray-600 text-xs">{order.date}</span>
+                    <span className="font-bold text-white">₹{order.total}</span>
+                  </div>
+                </div>
+                <button className="glass border border-white/5 rounded-xl px-3 py-2 text-xs font-semibold text-gray-400 hover:text-white transition-colors">Reorder</button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'Wishlist' && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {FOODS.slice(0,6).map(food => (
+              <div key={food.id} className="glass border border-white/5 rounded-2xl p-3 text-center card-hover">
+                <div className="text-4xl mb-2">{food.image}</div>
+                <div className="font-semibold text-white text-sm">{food.name}</div>
+                <div className="text-orange-400 font-bold text-sm mt-1">₹{food.price}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'Addresses' && (
+          <div className="space-y-3">
+            {[['🏠 Home','Hostel Block 7, Room 312, Campus Road, Delhi'],['🏫 College','IIT Delhi, Hauz Khas, New Delhi - 110016'],['💪 Gym','FitLife Studio, Sector 18, Noida']].map(([l,a]) => (
+              <div key={l} className="glass border border-white/5 rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                  <div className="font-semibold text-white mb-1">{l}</div>
+                  <div className="text-gray-400 text-sm">{a}</div>
+                </div>
+                <button className="text-orange-400 text-sm font-semibold hover:text-orange-300">Edit</button>
+              </div>
+            ))}
+            <button className="glass border border-white/5 border-dashed rounded-2xl p-4 w-full flex items-center justify-center gap-2 text-gray-500 hover:text-white hover:border-white/20 transition-all">
+              <Icon name="plus" size={16} />
+              Add New Address
+            </button>
+          </div>
+        )}
+
+        {activeTab === 'Subscription' && (
+          <div>
+            <div className="glass-orange rounded-3xl p-6 mb-6 relative overflow-hidden">
+              <div className="absolute -right-8 -top-8 text-8xl opacity-10">💪</div>
+              <div className="relative">
+                <span className="tag-orange px-3 py-1 rounded-full text-xs font-bold mb-3 inline-block">Current Plan</span>
+                <h3 className="font-display font-black text-2xl text-white">Pro Athlete</h3>
+                <p className="text-gray-300 mt-1">30 meals/month · Renews June 1, 2025</p>
+                <div className="mt-4">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-400">Meals used this month</span>
+                    <span className="text-white font-bold">18/30</span>
+                  </div>
+                  <div className="h-2 bg-white/10 rounded-full">
+                    <div className="progress-bar" style={{width:'60%'}} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button onClick={() => setPage('subscription')} className="btn-primary w-full py-4 rounded-2xl font-display font-bold text-base">Upgrade to Elite Plan</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════
+// AUTH PAGES
+// ═══════════════════════════════════════
+
+const LoginPage = ({ setPage, setIsLoggedIn }) => {
+  const [showPass, setShowPass] = useState(false);
+  const [email, setEmail] = useState('');
+  const [pass, setPass] = useState('');
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setPage('home');
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 pt-20">
+      <div className="w-full max-w-md animate-fade-up">
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="w-12 h-12 rounded-2xl gradient-orange flex items-center justify-center font-display font-black text-white text-2xl">Z</div>
+          </div>
+          <h1 className="font-display font-black text-3xl text-white">Welcome back!</h1>
+          <p className="text-gray-400 mt-2">Sign in to your ZAAVO account</p>
+        </div>
+
+        <div className="glass border border-white/10 rounded-3xl p-8">
+          {/* Google */}
+          <button className="w-full flex items-center justify-center gap-3 glass border border-white/10 rounded-2xl py-3 mb-4 hover:border-white/20 transition-all font-semibold text-white">
+            <span className="text-xl">🌐</span>
+            Continue with Google
+          </button>
+          
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-gray-500 text-sm">or</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="text-gray-400 text-sm font-medium mb-1.5 block">Email or College ID</label>
+              <div className="relative">
+                <Icon name="mail" size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                <input value={email} onChange={e => setEmail(e.target.value)} type="email" className="input-field w-full rounded-2xl pl-11 pr-4 py-3" placeholder="your@college.edu" />
+              </div>
+            </div>
+            <div>
+              <label className="text-gray-400 text-sm font-medium mb-1.5 block">Password</label>
+              <div className="relative">
+                <Icon name="lock" size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                <input value={pass} onChange={e => setPass(e.target.value)} type={showPass ? "text" : "password"} className="input-field w-full rounded-2xl pl-11 pr-11 py-3" placeholder="••••••••" />
+                <button onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                  <Icon name={showPass ? "eye_off" : "eye"} size={16} />
+                </button>
+              </div>
+            </div>
+            <button onClick={() => setPage('forgot-password')} className="text-orange-400 text-sm hover:text-orange-300">Forgot password?</button>
+            <button onClick={handleLogin} className="btn-primary w-full py-4 rounded-2xl font-display font-bold text-lg">
+              Sign In to ZAAVO
+            </button>
+          </div>
+
+          <p className="text-center text-gray-500 text-sm mt-5">
+            New here? <button onClick={() => setPage('signup')} className="text-orange-400 font-semibold hover:text-orange-300">Create Account</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SignupPage = ({ setPage, setIsLoggedIn }) => {
+  const [step, setStep] = useState(1);
+  const handleNext = () => step < 3 ? setStep(step+1) : (setIsLoggedIn(true), setPage('home'));
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 pt-20">
+      <div className="w-full max-w-md animate-fade-up">
+        <div className="text-center mb-8">
+          <h1 className="font-display font-black text-3xl text-white">Join ZAAVO 🚀</h1>
+          <p className="text-gray-400 mt-2">Campus food, your way</p>
+          <div className="flex gap-1 justify-center mt-4">
+            {[1,2,3].map(s => <div key={s} className={`h-1.5 rounded-full transition-all ${s<=step ? 'bg-orange-500 w-8' : 'bg-white/10 w-4'}`} />)}
+          </div>
+        </div>
+
+        <div className="glass border border-white/10 rounded-3xl p-8">
+          {step === 1 && (
+            <div className="space-y-4 animate-fade-up">
+              <h3 className="font-display font-bold text-white text-lg mb-2">Basic Info</h3>
+              {[['Full Name','text','👤'],['Email','email','📧'],['Phone','tel','📱']].map(([l,t,e]) => (
+                <div key={l}>
+                  <label className="text-gray-400 text-sm block mb-1.5">{l}</label>
+                  <input type={t} className="input-field w-full rounded-2xl px-4 py-3" placeholder={`Enter your ${l.toLowerCase()}`} />
+                </div>
+              ))}
+            </div>
+          )}
+          {step === 2 && (
+            <div className="space-y-4 animate-fade-up">
+              <h3 className="font-display font-bold text-white text-lg mb-2">Campus Details</h3>
+              {[['College/Institution'],['Hostel/Dorm (optional)'],['City']].map(([l]) => (
+                <div key={l}>
+                  <label className="text-gray-400 text-sm block mb-1.5">{l}</label>
+                  <input className="input-field w-full rounded-2xl px-4 py-3" placeholder={l} />
+                </div>
+              ))}
+              <div>
+                <label className="text-gray-400 text-sm block mb-2">I am a...</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {['🎓 Student','💪 Gym Goer','🏫 Faculty','🏠 Hostelite'].map(r => (
+                    <button key={r} className="glass border border-white/10 rounded-xl py-2.5 text-sm text-gray-300 hover:border-orange-500/50 hover:text-white transition-all">{r}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+          {step === 3 && (
+            <div className="space-y-4 animate-fade-up">
+              <h3 className="font-display font-bold text-white text-lg mb-2">OTP Verification</h3>
+              <p className="text-gray-400 text-sm">Enter the 6-digit OTP sent to your phone</p>
+              <div className="flex gap-2 justify-center">
+                {[...Array(6)].map((_,i) => (
+                  <input key={i} maxLength={1} className="w-11 h-14 text-center font-bold text-xl input-field rounded-xl" />
+                ))}
+              </div>
+              <button className="text-orange-400 text-sm text-center w-full hover:text-orange-300">Resend OTP in 30s</button>
+            </div>
+          )}
+
+          <button onClick={handleNext} className="btn-primary w-full py-4 rounded-2xl font-display font-bold text-lg mt-6">
+            {step === 3 ? '🎉 Create Account' : 'Continue →'}
+          </button>
+          <p className="text-center text-gray-500 text-sm mt-4">
+            Have an account? <button onClick={() => setPage('login')} className="text-orange-400 font-semibold">Login</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════
+// SEARCH PAGE
+// ═══════════════════════════════════════
+
+const SearchPage = ({ setCart, setSelectedFood, setPage, setSelectedRestaurant }) => {
+  const [query, setQuery] = useState('');
+  const results = query.length > 1 ? {
+    foods: FOODS.filter(f => f.name.toLowerCase().includes(query.toLowerCase()) || f.category.toLowerCase().includes(query.toLowerCase())),
+    restaurants: RESTAURANTS.filter(r => r.name.toLowerCase().includes(query.toLowerCase()) || r.cuisine.toLowerCase().includes(query.toLowerCase())),
+  } : { foods: [], restaurants: [] };
+
+  const addToCart = (food, qty = 1) => {
+    setCart(prev => {
+      const existing = prev.find(i => i.id === food.id);
+      if (existing) return prev.map(i => i.id === food.id ? {...i, qty: i.qty + qty} : i);
+      return [...prev, {...food, qty}];
+    });
+  };
+
+  const trending = ['Chicken Bowl','Maggi','Protein Shake','Biryani','Vegan Wrap','Keto Platter'];
+
+  return (
+    <div className="min-h-screen pt-24 pb-24 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="relative mb-8">
+          <Icon name="search" size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+          <input autoFocus value={query} onChange={e => setQuery(e.target.value)} className="input-field w-full rounded-2xl pl-12 pr-4 py-4 text-lg" placeholder="Search meals, restaurants, cuisines..." />
+          {query && <button onClick={() => setQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white"><Icon name="x" size={18} /></button>}
+        </div>
+
+        {!query && (
+          <div>
+            <h3 className="font-display font-bold text-white mb-4">Trending Searches</h3>
+            <div className="flex flex-wrap gap-2">
+              {trending.map(t => (
+                <button key={t} onClick={() => setQuery(t)} className="cuisine-chip px-4 py-2 rounded-full text-sm">{t}</button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {query && (
+          <div>
+            {results.restaurants.length > 0 && (
+              <div className="mb-8">
+                <h3 className="font-display font-bold text-white mb-4">Restaurants ({results.restaurants.length})</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {results.restaurants.map(r => <RestaurantCard key={r.id} r={r} onClick={() => { setSelectedRestaurant(r); setPage('restaurant-detail'); }} />)}
+                </div>
+              </div>
+            )}
+            {results.foods.length > 0 && (
+              <div>
+                <h3 className="font-display font-bold text-white mb-4">Foods ({results.foods.length})</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {results.foods.map(f => <FoodCard key={f.id} food={f} onOpen={setSelectedFood} onAdd={addToCart} />)}
+                </div>
+              </div>
+            )}
+            {results.foods.length === 0 && results.restaurants.length === 0 && (
+              <div className="text-center py-20">
+                <div className="text-6xl mb-4">🔍</div>
+                <p className="text-gray-400">No results for "{query}"</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════
+// OFFERS PAGE
+// ═══════════════════════════════════════
+
+const OffersPage = () => {
+  const [copiedCode, setCopiedCode] = useState(null);
+  const copyCode = (code) => {
+    navigator.clipboard?.writeText(code).catch(() => {});
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
+  return (
+    <div className="min-h-screen pt-24 pb-24 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-10">
+          <h1 className="font-display font-black text-4xl text-white mb-2">Exclusive Deals 🎉</h1>
+          <p className="text-gray-400">Limited time offers crafted for campus life</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {[...OFFERS, ...OFFERS.map(o => ({...o, id: o.id+10, title: o.title+' Plus', code: o.code+'2'}))].slice(0,6).map(offer => (
+            <div key={offer.id} className={`bg-gradient-to-br ${offer.color} rounded-3xl p-7 relative overflow-hidden`}>
+              <div className="absolute -right-6 -top-6 text-8xl opacity-15">{offer.icon}</div>
+              <div className="text-4xl mb-4">{offer.icon}</div>
+              <h3 className="font-display font-black text-white text-2xl mb-2">{offer.title}</h3>
+              <p className="text-white/70 mb-5 leading-relaxed">{offer.desc}</p>
+              <div className="flex items-center justify-between">
+                <button onClick={() => copyCode(offer.code)} className="flex items-center gap-2 bg-black/30 hover:bg-black/40 border border-white/20 rounded-xl px-4 py-2.5 transition-colors">
+                  <span className="font-bold text-white tracking-widest">{offer.code}</span>
+                  <Icon name={copiedCode === offer.code ? "check" : "copy"} size={15} className={copiedCode === offer.code ? "text-lime-400" : "text-white/60"} />
+                </button>
+                {copiedCode === offer.code && <span className="text-lime-400 text-sm font-bold animate-fade-in">Copied!</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════
+// SUBSCRIPTION PAGE
+// ═══════════════════════════════════════
+
+const SubscriptionPage = () => (
+  <div className="min-h-screen pt-24 pb-24 px-4">
+    <div className="max-w-5xl mx-auto">
+      <div className="text-center mb-12">
+        <div className="section-label tag-lime mb-4 mx-auto w-fit"><Icon name="zap" size={12} className="text-lime-400" />Meal Subscriptions</div>
+        <h1 className="font-display font-black text-5xl text-white mb-3">Eat Smart. <span className="gradient-text">Save Big.</span></h1>
+        <p className="text-gray-400 text-lg max-w-lg mx-auto">Monthly plans designed for campus athletes, gym warriors, and budget-conscious students.</p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+        {SUBSCRIPTION_PLANS.map(plan => (
+          <div key={plan.name} className={`relative bg-gradient-to-br ${plan.color} rounded-3xl p-7 border border-white/10 ${plan.badge === 'Most Popular' ? 'scale-105 shadow-2xl shadow-orange-500/20 ring-2 ring-orange-500/30' : ''}`}>
+            {plan.badge && <div className="absolute -top-3 left-1/2 -translate-x-1/2"><span className={`px-4 py-1 rounded-full text-xs font-bold ${plan.badge === 'Most Popular' ? 'bg-orange-500 text-white' : 'bg-lime-500 text-black'}`}>{plan.badge}</span></div>}
+            <h3 className="font-display font-black text-2xl text-white mb-1">{plan.name}</h3>
+            <div className="mb-3"><span className="font-black text-4xl text-white">₹{plan.price}</span><span className="text-gray-300 text-sm">/{plan.period}</span></div>
+            <div className="text-orange-200 text-sm mb-5">{plan.meals} meals · Save {plan.discount}</div>
+            <ul className="space-y-2.5 mb-7">
+              {plan.features.map(f => (<li key={f} className="flex items-center gap-2 text-gray-200 text-sm"><Icon name="check" size={15} className="text-lime-400 shrink-0"/>{f}</li>))}
+            </ul>
+            <button className={`w-full py-3.5 rounded-2xl font-display font-bold text-base ${plan.badge === 'Most Popular' ? 'btn-primary animate-pulse-glow' : 'btn-secondary'}`}>Choose {plan.name}</button>
+          </div>
+        ))}
+      </div>
+      <div className="glass border border-white/5 rounded-3xl p-8 text-center">
+        <div className="text-4xl mb-3">🎁</div>
+        <h3 className="font-display font-black text-2xl text-white mb-2">Refer & Earn</h3>
+        <p className="text-gray-400 mb-5">Get ₹200 ZAAVO credits for every friend who subscribes</p>
+        <div className="flex items-center justify-center gap-3 max-w-sm mx-auto">
+          <div className="flex-1 glass border border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-300 font-mono">ZAAVO-REF-RS2025</div>
+          <button className="btn-primary px-4 py-2.5 rounded-xl font-bold text-sm">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// ═══════════════════════════════════════
+// FORGOT PASSWORD PAGE
+// ═══════════════════════════════════════
+
+const ForgotPasswordPage = ({ setPage }) => (
+  <div className="min-h-screen flex items-center justify-center px-4 pt-20">
+    <div className="w-full max-w-md animate-fade-up">
+      <div className="text-center mb-8">
+        <div className="text-5xl mb-4">🔐</div>
+        <h1 className="font-display font-black text-3xl text-white">Reset Password</h1>
+        <p className="text-gray-400 mt-2">We'll send you a recovery link</p>
+      </div>
+      <div className="glass border border-white/10 rounded-3xl p-8">
+        <label className="text-gray-400 text-sm block mb-1.5">Email Address</label>
+        <div className="relative mb-5">
+          <Icon name="mail" size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+          <input type="email" className="input-field w-full rounded-2xl pl-11 pr-4 py-3" placeholder="your@college.edu" />
+        </div>
+        <button className="btn-primary w-full py-4 rounded-2xl font-display font-bold text-lg mb-4">Send Recovery Link</button>
+        <button onClick={() => setPage('login')} className="w-full text-center text-gray-500 text-sm hover:text-white transition-colors">← Back to Login</button>
+      </div>
+    </div>
+  </div>
+);
+
+// ═══════════════════════════════════════
+// MAIN APP
+// ═══════════════════════════════════════
+
+const App = () => {
+  const [page, setPage] = useState('home');
+  const [cart, setCart] = useState([]);
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
+  const [selectedFood, setSelectedFood] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const cartCount = cart.reduce((s, i) => s + i.qty, 0);
+
+  const renderPage = () => {
+    switch(page) {
+      case 'home': return <HomePage setPage={setPage} cart={cart} setCart={setCart} setSelectedRestaurant={setSelectedRestaurant} setSelectedFood={setSelectedFood} />;
+      case 'restaurants': return <RestaurantsPage setPage={setPage} setSelectedRestaurant={setSelectedRestaurant} />;
+      case 'restaurant-detail': return <RestaurantDetailPage restaurant={selectedRestaurant} setCart={setCart} setSelectedFood={setSelectedFood} />;
+      case 'fitness': return <FitnessPage setCart={setCart} />;
+      case 'cart': return <CartPage cart={cart} setCart={setCart} setPage={setPage} />;
+      case 'order-tracking': return <OrderTrackingPage setCart={setCart} />;
+      case 'profile': return isLoggedIn ? <ProfilePage setPage={setPage} setIsLoggedIn={setIsLoggedIn} /> : <LoginPage setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
+      case 'login': return <LoginPage setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
+      case 'signup': return <SignupPage setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
+      case 'forgot-password': return <ForgotPasswordPage setPage={setPage} />;
+      case 'search': return <SearchPage setCart={setCart} setSelectedFood={setSelectedFood} setPage={setPage} setSelectedRestaurant={setSelectedRestaurant} />;
+      case 'offers': return <OffersPage />;
+      case 'subscription': return <SubscriptionPage />;
+      default: return <HomePage setPage={setPage} cart={cart} setCart={setCart} setSelectedRestaurant={setSelectedRestaurant} setSelectedFood={setSelectedFood} />;
+    }
+  };
+
+  return (
+    <div>
+      <Navbar page={page} setPage={setPage} cartCount={cartCount} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+      <main key={page} className="animate-fade-in">
+        {renderPage()}
+      </main>
+      <BottomNav page={page} setPage={setPage} cartCount={cartCount} />
+
+      {/* Food Modal */}
+      {selectedFood && (
+        <FoodModal
+          food={selectedFood}
+          onClose={() => setSelectedFood(null)}
+          onAdd={(food, qty) => {
+            setCart(prev => {
+              const existing = prev.find(i => i.id === food.id);
+              if (existing) return prev.map(i => i.id === food.id ? {...i, qty: i.qty + qty} : i);
+              return [...prev, {...food, qty}];
+            });
+          }}
+        />
+      )}
+
+      {/* Cart Toast */}
+      {cartCount > 0 && page !== 'cart' && page !== 'order-tracking' && (
+        <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-40">
+          <button onClick={() => setPage('cart')} className="btn-primary px-6 py-3 rounded-2xl font-display font-bold flex items-center gap-3 animate-pulse-glow shadow-2xl shadow-orange-500/30">
+            <Icon name="cart" size={18} />
+            <span>{cartCount} item{cartCount > 1 ? 's' : ''} in cart</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded-lg text-sm">View →</span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ZAAVO Admin — Control Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root { --orange:#FF5722; --lime:#AEEA00; --dark:#0A0A0A; --dark2:#111; --dark3:#1A1A1A; --dark4:#222; --gray:#888; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'DM Sans',sans-serif; background:var(--dark); color:#fff; -webkit-font-smoothing:antialiased; }
+  .font-display { font-family:'Syne',sans-serif; }
+  ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:#111; } ::-webkit-scrollbar-thumb { background:#FF5722; border-radius:2px; }
+  .glass { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); backdrop-filter:blur(20px); }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes countUp { from { opacity:0; } to { opacity:1; } }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+  @keyframes barGrow { from { width:0; } to { width:var(--w); } }
+  .fade-up { animation:fadeUp 0.5s ease forwards; }
+  .live-dot { animation:pulse 2s ease-in-out infinite; }
+  .gradient-orange { background:linear-gradient(135deg,#FF5722,#FF7043); }
+  .gradient-lime { background:linear-gradient(135deg,#AEEA00,#8BC34A); }
+  .stat-card { transition:all 0.3s ease; }
+  .stat-card:hover { transform:translateY(-4px); box-shadow:0 20px 40px rgba(255,87,34,0.1); }
+  .nav-item { transition:all 0.2s ease; cursor:pointer; }
+  .nav-item:hover { background:rgba(255,87,34,0.08); color:#fff; }
+  .nav-item.active { background:rgba(255,87,34,0.12); color:#FF5722; border-left:2px solid #FF5722; }
+  .badge-orange { background:rgba(255,87,34,0.12); border:1px solid rgba(255,87,34,0.25); color:#FF5722; }
+  .badge-lime { background:rgba(174,234,0,0.1); border:1px solid rgba(174,234,0,0.25); color:#AEEA00; }
+  .badge-red { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); color:#f87171; }
+  .badge-blue { background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.25); color:#93c5fd; }
+  .table-row { border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.2s; }
+  .table-row:hover { background:rgba(255,255,255,0.02); }
+  .progress-track { background:rgba(255,255,255,0.06); height:6px; border-radius:3px; overflow:hidden; }
+  .chart-bar { border-radius:4px 4px 0 0; transition:all 0.5s ease; cursor:pointer; }
+  .chart-bar:hover { opacity:0.8; }
+  .toggle-switch { position:relative; width:40px; height:22px; }
+  .toggle-switch input { opacity:0; width:0; height:0; }
+  .toggle-knob { position:absolute; cursor:pointer; inset:0; background:#333; border-radius:22px; transition:0.3s; }
+  .toggle-knob:before { content:''; position:absolute; width:16px; height:16px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.3s; }
+  input:checked + .toggle-knob { background:#FF5722; }
+  input:checked + .toggle-knob:before { transform:translateX(18px); }
+  .sparkline { fill:none; stroke:#FF5722; stroke-width:2; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+// ── Fake data ──────────────────────────────────────────────
+const STATS = [
+  { label:'Total Revenue', value:'₹4,82,340', change:'+18.4%', up:true, icon:'💰', sub:'This month' },
+  { label:'Total Orders', value:'8,921', change:'+12.1%', up:true, icon:'📦', sub:'This month' },
+  { label:'Active Users', value:'3,204', change:'+7.8%', up:true, icon:'👤', sub:'Registered' },
+  { label:'Restaurants', value:'47', change:'+3', up:true, icon:'🍽', sub:'Active & verified' },
+  { label:'Delivery Partners', value:'128', change:'+15', up:true, icon:'🛵', sub:'Online right now: 34' },
+  { label:'Avg Order Value', value:'₹342', change:'-2.1%', up:false, icon:'📊', sub:'Per transaction' },
+];
+
+const REVENUE_DATA = [
+  { day:'Mon', revenue:42000, orders:124 },
+  { day:'Tue', revenue:38000, orders:108 },
+  { day:'Wed', revenue:55000, orders:161 },
+  { day:'Thu', revenue:61000, orders:178 },
+  { day:'Fri', revenue:78000, orders:228 },
+  { day:'Sat', revenue:92000, orders:268 },
+  { day:'Sun', revenue:84000, orders:245 },
+];
+
+const ORDERS = [
+  { id:'ZAV-8921', user:'Rohan Sharma', restaurant:'The Protein Kitchen', amount:'₹408', status:'delivered', time:'2 min ago', items:2 },
+  { id:'ZAV-8920', user:'Priya Mehta', restaurant:'Campus Bites', amount:'₹138', status:'preparing', time:'5 min ago', items:3 },
+  { id:'ZAV-8919', user:'Arjun Reddy', restaurant:'Muscle Meal Co.', amount:'₹699', status:'out_for_delivery', time:'12 min ago', items:2 },
+  { id:'ZAV-8918', user:'Sneha Patel', restaurant:'Green Bowl', amount:'₹268', status:'confirmed', time:'15 min ago', items:1 },
+  { id:'ZAV-8917', user:'Dev Kumar', restaurant:'Pizza Lab', amount:'₹549', status:'cancelled', time:'18 min ago', items:4 },
+  { id:'ZAV-8916', user:'Anita Singh', restaurant:'Shake Station', amount:'₹318', status:'delivered', time:'22 min ago', items:2 },
+];
+
+const RESTAURANTS_PENDING = [
+  { name:'Healthy Hub', owner:'Raj Patel', city:'Delhi', cuisine:'Healthy Food', since:'2 days ago', docs:'✅ Complete' },
+  { name:'Biryani Bros', owner:'Akram Khan', city:'Noida', cuisine:'North Indian', since:'1 day ago', docs:'⚠️ Missing FSSAI' },
+  { name:'Keto Kitchen', owner:'Meera Nair', city:'Gurgaon', cuisine:'Keto/Fitness', since:'3 hours ago', docs:'✅ Complete' },
+];
+
+const USERS_DATA = [
+  { name:'Rohan Sharma', email:'rohan@iitd.ac.in', role:'customer', type:'student', orders:47, spent:'₹12,450', joined:'Jan 2025', status:'active' },
+  { name:'Priya Mehta', email:'priya@gym.com', role:'customer', type:'gym_goer', orders:23, spent:'₹8,200', joined:'Feb 2025', status:'active' },
+  { name:'Raj Patel', email:'raj@healthyhub.com', role:'restaurant_owner', type:'other', orders:0, spent:'—', joined:'Mar 2025', status:'pending' },
+  { name:'Rahul Kumar', email:'rahul.delivery@zaavo.com', role:'delivery_partner', type:'other', orders:312, spent:'—', joined:'Dec 2024', status:'active' },
+  { name:'Sneha Patel', email:'sneha.cf@gmail.com', role:'customer', type:'gym_goer', orders:31, spent:'₹9,800', joined:'Jan 2025', status:'active' },
+];
+
+const TOP_FOODS = [
+  { name:'High Protein Chicken Bowl', restaurant:'Protein Kitchen', orders:1204, revenue:'₹3,01,596' },
+  { name:'Masala Maggi Stack', restaurant:'Campus Bites', orders:989, revenue:'₹68,241' },
+  { name:'Bulk Up Thali', restaurant:'Muscle Meal Co.', orders:678, revenue:'₹2,36,922' },
+  { name:'Post-Workout Shake', restaurant:'Shake Station', orders:543, revenue:'₹86,337' },
+  { name:'Vegan Protein Wrap', restaurant:'Green Bowl', orders:421, revenue:'₹79,569' },
+];
+
+// ── Icon helper ────────────────────────────────────────────
+const Icon = ({ n, s=18 }) => {
+  const icons = {
+    home:     <svg width={s} height={s} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+    orders:   <svg width={s} height={s} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
+    users:    <svg width={s} height={s} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+    restaurant:<svg width={s} height={s} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>,
+    chart:    <svg width={s} height={s} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
+    coupon:   <svg width={s} height={s} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>,
+    bell:     <svg width={s} height={s} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
+    check:    <svg width={s} height={s} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>,
+    x:        <svg width={s} height={s} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    search:   <svg width={s} height={s} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>,
+    food:     <svg width={s} height={s} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>,
+    bike:     <svg width={s} height={s} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-4"/><path d="m9 6 4 5.5"/><path d="M5.5 17.5 9 6"/><path d="m15 6 3 11.5"/><path d="M15 6h4"/></svg>,
+  };
+  return icons[n] || <span>{n}</span>;
+};
+
+// ── Status badge ───────────────────────────────────────────
+const StatusBadge = ({ status }) => {
+  const map = {
+    delivered:        ['badge-lime','Delivered'],
+    preparing:        ['badge-orange','Preparing'],
+    out_for_delivery: ['badge-blue','On Way'],
+    confirmed:        ['badge-blue','Confirmed'],
+    cancelled:        ['badge-red','Cancelled'],
+    placed:           ['badge-orange','Placed'],
+    active:           ['badge-lime','Active'],
+    pending:          ['badge-orange','Pending'],
+    suspended:        ['badge-red','Suspended'],
+  };
+  const [cls, label] = map[status] || ['badge-orange', status];
+  return <span className={`${cls} text-xs font-bold px-2.5 py-1 rounded-full`}>{label}</span>;
+};
+
+// ── Mini Chart ─────────────────────────────────────────────
+const RevenueChart = () => {
+  const max = Math.max(...REVENUE_DATA.map(d => d.revenue));
+  return (
+    <div className="flex items-end gap-2 h-32">
+      {REVENUE_DATA.map((d, i) => (
+        <div key={i} className="flex-1 flex flex-col items-center gap-1">
+          <div className="w-full relative" style={{height:'100px'}}>
+            <div
+              className="chart-bar absolute bottom-0 left-0 right-0 gradient-orange"
+              style={{height:`${(d.revenue/max)*100}%`, opacity: 0.7 + (i/REVENUE_DATA.length)*0.3}}
+              title={`₹${d.revenue.toLocaleString()}`}
+            />
+          </div>
+          <span className="text-gray-500 text-xs">{d.day}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ── Donut Chart (CSS) ──────────────────────────────────────
+const DonutChart = ({ segments }) => {
+  const total = segments.reduce((s,g) => s+g.value, 0);
+  let cum = 0;
+  const r = 40, cx = 50, cy = 50, circum = 2*Math.PI*r;
+  return (
+    <svg viewBox="0 0 100 100" className="w-28 h-28 -rotate-90">
+      {segments.map((seg, i) => {
+        const pct = seg.value/total;
+        const dash = pct*circum;
+        const gap  = circum - dash;
+        const offset = circum - cum*circum;
+        cum += pct;
+        return (
+          <circle key={i} cx={cx} cy={cy} r={r} fill="none" stroke={seg.color}
+            strokeWidth="16" strokeDasharray={`${dash} ${gap}`} strokeDashoffset={offset} />
+        );
+      })}
+    </svg>
+  );
+};
+
+// ── Main Admin App ─────────────────────────────────────────
+const AdminApp = () => {
+  const [tab, setTab] = useState('dashboard');
+  const [notifications, setNotifications] = useState(3);
+  const [broadcastText, setBroadcastText] = useState('');
+  const [showBroadcast, setShowBroadcast] = useState(false);
+  const [liveOrders, setLiveOrders] = useState(ORDERS);
+  const [restaurantFilter, setRestaurantFilter] = useState('all');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Simulate live updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveOrders(prev => {
+        const updated = [...prev];
+        const statusFlow = { placed:'confirmed', confirmed:'preparing', preparing:'out_for_delivery', out_for_delivery:'delivered' };
+        const idx = Math.floor(Math.random() * updated.length);
+        if (updated[idx].status !== 'delivered' && updated[idx].status !== 'cancelled') {
+          updated[idx] = {...updated[idx], status: statusFlow[updated[idx].status] || updated[idx].status};
+        }
+        return updated;
+      });
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const navItems = [
+    ['dashboard','Dashboard',  'home'],
+    ['orders',   'Orders',     'orders'],
+    ['users',    'Users',      'users'],
+    ['restaurants','Restaurants','restaurant'],
+    ['foods',    'Menu Items', 'food'],
+    ['analytics','Analytics',  'chart'],
+    ['coupons',  'Coupons',    'coupon'],
+    ['delivery', 'Delivery',   'bike'],
+  ];
+
+  const renderContent = () => {
+    switch(tab) {
+      case 'dashboard':  return <Dashboard liveOrders={liveOrders} />;
+      case 'orders':     return <OrdersPanel liveOrders={liveOrders} />;
+      case 'users':      return <UsersPanel />;
+      case 'restaurants':return <RestaurantsPanel />;
+      case 'foods':      return <FoodsPanel />;
+      case 'analytics':  return <AnalyticsPanel />;
+      case 'coupons':    return <CouponsPanel />;
+      case 'delivery':   return <DeliveryPanel />;
+      default:           return <Dashboard liveOrders={liveOrders} />;
+    }
+  };
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      {/* Sidebar */}
+      <aside className={`${sidebarOpen ? 'w-56' : 'w-16'} glass border-r border-white/5 flex flex-col transition-all duration-300 shrink-0`}>
+        {/* Logo */}
+        <div className={`flex items-center gap-3 p-4 border-b border-white/5 ${!sidebarOpen && 'justify-center'}`}>
+          <div className="w-9 h-9 gradient-orange rounded-xl flex items-center justify-center font-display font-black text-white text-lg shrink-0">Z</div>
+          {sidebarOpen && <div><div className="font-display font-black text-white text-base">ZAAVO</div><div className="text-gray-500 text-xs">Admin Console</div></div>}
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
+          {navItems.map(([id, label, icon]) => (
+            <div key={id} onClick={() => setTab(id)}
+              className={`nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 ${tab===id ? 'active' : ''}`}>
+              <Icon n={icon} s={18} />
+              {sidebarOpen && <span>{label}</span>}
+              {sidebarOpen && id === 'orders' && (
+                <span className="ml-auto bg-orange-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                  {liveOrders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled').length}
+                </span>
+              )}
+            </div>
+          ))}
+        </nav>
+
+        {/* User */}
+        <div className={`p-3 border-t border-white/5 flex items-center gap-2 ${!sidebarOpen && 'justify-center'}`}>
+          <div className="w-8 h-8 gradient-orange rounded-xl flex items-center justify-center font-bold text-white text-xs shrink-0">SA</div>
+          {sidebarOpen && <div><div className="text-white text-xs font-semibold">Super Admin</div><div className="text-gray-500 text-xs">admin@zaavo.app</div></div>}
+        </div>
+      </aside>
+
+      {/* Main */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Bar */}
+        <header className="glass border-b border-white/5 px-5 py-3 flex items-center gap-4 shrink-0">
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-colors">
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <h1 className="font-display font-bold text-white capitalize">{tab}</h1>
+          <div className="flex items-center gap-2 glass border border-white/5 rounded-xl px-3 py-1.5 ml-4 flex-1 max-w-xs">
+            <Icon n="search" s={14} /><input className="bg-transparent text-sm text-white placeholder-gray-500 outline-none flex-1" placeholder="Search anything..." />
+          </div>
+          <div className="ml-auto flex items-center gap-3">
+            {/* Live indicator */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-lime-500/20 bg-lime-500/5">
+              <div className="w-2 h-2 rounded-full bg-lime-400 live-dot" />
+              <span className="text-lime-400 text-xs font-semibold">Live</span>
+            </div>
+            <button onClick={() => setShowBroadcast(true)} className="gradient-orange px-4 py-2 rounded-xl text-white text-sm font-bold">
+              📣 Broadcast
+            </button>
+            <button className="relative p-2 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white">
+              <Icon n="bell" s={18} />
+              {notifications > 0 && <span className="absolute top-0 right-0 w-4 h-4 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center font-bold">{notifications}</span>}
+            </button>
+          </div>
+        </header>
+
+        {/* Content */}
+        <main className="flex-1 overflow-y-auto p-5" key={tab} style={{animation:'fadeUp 0.4s ease forwards'}}>
+          {renderContent()}
+        </main>
+      </div>
+
+      {/* Broadcast Modal */}
+      {showBroadcast && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50">
+          <div className="glass border border-white/10 rounded-3xl p-6 w-full max-w-md fade-up">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display font-bold text-white text-xl">📣 Send Broadcast</h3>
+              <button onClick={() => setShowBroadcast(false)} className="text-gray-400 hover:text-white"><Icon n="x" s={18} /></button>
+            </div>
+            <input className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none mb-3 focus:border-orange-500/50" placeholder="Notification title..." />
+            <textarea rows="3" value={broadcastText} onChange={e=>setBroadcastText(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none mb-4 resize-none focus:border-orange-500/50" placeholder="Message for all users..." />
+            <div className="flex gap-3 mb-4">
+              {['All Users','Students','Gym Goers','Premium'].map(t => (
+                <button key={t} className="text-xs px-3 py-1.5 rounded-lg border border-white/10 text-gray-400 hover:border-orange-500/50 hover:text-orange-400 transition-all">{t}</button>
+              ))}
+            </div>
+            <button onClick={() => setShowBroadcast(false)} className="gradient-orange w-full py-3 rounded-xl font-display font-bold text-white">
+              Send to 3,204 Users →
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ── Dashboard Tab ──────────────────────────────────────────
+const Dashboard = ({ liveOrders }) => (
+  <div className="space-y-5">
+    {/* Stats Grid */}
+    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+      {STATS.map((s, i) => (
+        <div key={i} className="stat-card glass border border-white/5 rounded-2xl p-4">
+          <div className="flex items-start justify-between mb-3">
+            <span className="text-2xl">{s.icon}</span>
+            <span className={`text-xs font-bold ${s.up ? 'text-lime-400' : 'text-red-400'}`}>{s.change}</span>
+          </div>
+          <div className="font-display font-black text-white text-xl mb-1">{s.value}</div>
+          <div className="text-gray-500 text-xs">{s.label}</div>
+        </div>
+      ))}
+    </div>
+
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* Revenue Chart */}
+      <div className="lg:col-span-2 glass border border-white/5 rounded-2xl p-5">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h3 className="font-display font-bold text-white">Revenue — Last 7 Days</h3>
+            <p className="text-gray-500 text-sm mt-0.5">₹4,50,000 total this week</p>
+          </div>
+          <div className="flex gap-2">
+            {['7D','30D','90D'].map(p => <button key={p} className="text-xs px-3 py-1 rounded-lg border border-white/5 text-gray-400 hover:border-orange-500/30 hover:text-orange-400 transition-all">{p}</button>)}
+          </div>
+        </div>
+        <RevenueChart />
+      </div>
+
+      {/* Order Breakdown Donut */}
+      <div className="glass border border-white/5 rounded-2xl p-5">
+        <h3 className="font-display font-bold text-white mb-4">Order Types</h3>
+        <div className="flex items-center justify-center mb-4">
+          <DonutChart segments={[
+            { value:42, color:'#FF5722' },
+            { value:28, color:'#AEEA00' },
+            { value:18, color:'#3B82F6' },
+            { value:12, color:'#8B5CF6' },
+          ]} />
+        </div>
+        <div className="space-y-2">
+          {[['#FF5722','Fitness Meals','42%'],['#AEEA00','Budget Meals','28%'],['#3B82F6','Regular Food','18%'],['#8B5CF6','Subscriptions','12%']].map(([c,l,p]) => (
+            <div key={l} className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full shrink-0" style={{background:c}} />
+              <span className="text-gray-400 text-xs flex-1">{l}</span>
+              <span className="text-white text-xs font-bold">{p}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    {/* Live Orders */}
+    <div className="glass border border-white/5 rounded-2xl p-5">
+      <div className="flex items-center gap-3 mb-4">
+        <h3 className="font-display font-bold text-white">Live Orders</h3>
+        <div className="w-2 h-2 rounded-full bg-lime-400 live-dot" />
+        <span className="text-lime-400 text-xs font-semibold">Real-time</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="text-gray-500 text-xs uppercase tracking-wider">
+              <th className="text-left pb-3 font-medium">Order ID</th>
+              <th className="text-left pb-3 font-medium">Customer</th>
+              <th className="text-left pb-3 font-medium hidden md:table-cell">Restaurant</th>
+              <th className="text-left pb-3 font-medium">Amount</th>
+              <th className="text-left pb-3 font-medium">Status</th>
+              <th className="text-left pb-3 font-medium hidden lg:table-cell">Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {liveOrders.map((o, i) => (
+              <tr key={i} className="table-row">
+                <td className="py-3 text-orange-400 font-mono text-sm font-semibold">{o.id}</td>
+                <td className="py-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 gradient-orange rounded-lg flex items-center justify-center text-white text-xs font-bold">{o.user[0]}</div>
+                    <span className="text-white text-sm">{o.user}</span>
+                  </div>
+                </td>
+                <td className="py-3 text-gray-400 text-sm hidden md:table-cell">{o.restaurant}</td>
+                <td className="py-3 text-white font-bold text-sm">{o.amount}</td>
+                <td className="py-3"><StatusBadge status={o.status} /></td>
+                <td className="py-3 text-gray-500 text-xs hidden lg:table-cell">{o.time}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {/* Pending Approvals */}
+    <div className="glass border border-white/5 rounded-2xl p-5">
+      <h3 className="font-display font-bold text-white mb-4">Pending Restaurant Approvals 🔔</h3>
+      <div className="space-y-3">
+        {RESTAURANTS_PENDING.map((r, i) => (
+          <div key={i} className="flex items-center gap-4 p-3 rounded-xl bg-white/2 hover:bg-white/3 transition-colors">
+            <div className="w-10 h-10 rounded-xl gradient-orange flex items-center justify-center text-white font-bold shrink-0">{r.name[0]}</div>
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-white text-sm">{r.name}</div>
+              <div className="text-gray-500 text-xs">{r.owner} · {r.city} · {r.cuisine}</div>
+            </div>
+            <div className="text-gray-500 text-xs hidden md:block">{r.docs}</div>
+            <div className="flex gap-2 shrink-0">
+              <button className="w-8 h-8 rounded-xl bg-lime-500/10 border border-lime-500/20 flex items-center justify-center text-lime-400 hover:bg-lime-500/20 transition-colors"><Icon n="check" s={14} /></button>
+              <button className="w-8 h-8 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500/20 transition-colors"><Icon n="x" s={14} /></button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+// ── Orders Tab ─────────────────────────────────────────────
+const OrdersPanel = ({ liveOrders }) => {
+  const [filter, setFilter] = useState('all');
+  const statuses = ['all','placed','confirmed','preparing','out_for_delivery','delivered','cancelled'];
+  const filtered = filter === 'all' ? liveOrders : liveOrders.filter(o => o.status === filter);
+  return (
+    <div>
+      <div className="flex gap-2 overflow-x-auto pb-2 mb-5">
+        {statuses.map(s => (
+          <button key={s} onClick={() => setFilter(s)} className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filter===s ? 'gradient-orange text-white' : 'glass border border-white/5 text-gray-400 hover:text-white'}`}>
+            {s.replace(/_/g,' ').replace(/\b\w/g,l=>l.toUpperCase())}
+          </button>
+        ))}
+      </div>
+      <div className="glass border border-white/5 rounded-2xl overflow-hidden">
+        <table className="w-full">
+          <thead className="border-b border-white/5">
+            <tr className="text-gray-500 text-xs uppercase tracking-wider">
+              {['Order ID','Customer','Restaurant','Amount','Status','Time','Actions'].map(h => (
+                <th key={h} className="text-left py-4 px-4 font-medium">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((o, i) => (
+              <tr key={i} className="table-row">
+                <td className="py-3 px-4 text-orange-400 font-mono text-sm font-semibold">{o.id}</td>
+                <td className="py-3 px-4 text-white text-sm">{o.user}</td>
+                <td className="py-3 px-4 text-gray-400 text-sm">{o.restaurant}</td>
+                <td className="py-3 px-4 text-white font-bold text-sm">{o.amount}</td>
+                <td className="py-3 px-4"><StatusBadge status={o.status} /></td>
+                <td className="py-3 px-4 text-gray-500 text-xs">{o.time}</td>
+                <td className="py-3 px-4">
+                  <button className="text-orange-400 text-xs font-semibold hover:text-orange-300">View</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// ── Users Tab ──────────────────────────────────────────────
+const UsersPanel = () => (
+  <div>
+    <div className="grid grid-cols-4 gap-3 mb-5">
+      {[['3,204','Total Users'],['2,891','Active'],['312','Gym Goers'],['1,640','Students']].map(([v,l]) => (
+        <div key={l} className="glass border border-white/5 rounded-2xl p-4">
+          <div className="font-display font-black text-white text-2xl">{v}</div>
+          <div className="text-gray-500 text-xs mt-1">{l}</div>
+        </div>
+      ))}
+    </div>
+    <div className="glass border border-white/5 rounded-2xl overflow-hidden">
+      <div className="p-4 border-b border-white/5 flex items-center gap-3">
+        <h3 className="font-display font-bold text-white flex-1">User Management</h3>
+        <button className="gradient-orange px-4 py-2 rounded-xl text-white text-sm font-bold">+ Invite User</button>
+      </div>
+      <table className="w-full">
+        <thead className="border-b border-white/5">
+          <tr className="text-gray-500 text-xs uppercase tracking-wider">
+            {['User','Role','Type','Orders','Spent','Joined','Status','Actions'].map(h => (
+              <th key={h} className="text-left py-3 px-4 font-medium">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {USERS_DATA.map((u, i) => (
+            <tr key={i} className="table-row">
+              <td className="py-3 px-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 gradient-orange rounded-xl flex items-center justify-center font-bold text-white text-xs">{u.name.split(' ').map(w=>w[0]).join('')}</div>
+                  <div>
+                    <div className="text-white text-sm font-medium">{u.name}</div>
+                    <div className="text-gray-500 text-xs">{u.email}</div>
+                  </div>
+                </div>
+              </td>
+              <td className="py-3 px-4"><span className="badge-blue text-xs px-2 py-0.5 rounded-full font-bold">{u.role}</span></td>
+              <td className="py-3 px-4 text-gray-400 text-sm">{u.type}</td>
+              <td className="py-3 px-4 text-white text-sm">{u.orders}</td>
+              <td className="py-3 px-4 text-white font-semibold text-sm">{u.spent}</td>
+              <td className="py-3 px-4 text-gray-500 text-xs">{u.joined}</td>
+              <td className="py-3 px-4"><StatusBadge status={u.status} /></td>
+              <td className="py-3 px-4">
+                <div className="flex gap-1">
+                  <button className="text-orange-400 text-xs hover:text-orange-300">Edit</button>
+                  <span className="text-gray-600">·</span>
+                  <button className="text-red-400 text-xs hover:text-red-300">Ban</button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
+
+// ── Restaurants Tab ────────────────────────────────────────
+const RestaurantsPanel = () => (
+  <div className="space-y-5">
+    <div className="glass border border-white/5 rounded-2xl p-5">
+      <h3 className="font-display font-bold text-white mb-4">Pending Approvals</h3>
+      {RESTAURANTS_PENDING.map((r, i) => (
+        <div key={i} className="flex items-center gap-4 p-4 rounded-xl border border-white/5 mb-3">
+          <div className="w-12 h-12 gradient-orange rounded-2xl flex items-center justify-center text-2xl">{['🥦','🍛','🥑'][i]}</div>
+          <div className="flex-1">
+            <div className="font-bold text-white">{r.name}</div>
+            <div className="text-gray-400 text-sm">{r.owner} · {r.city} · {r.cuisine}</div>
+            <div className="text-gray-500 text-xs mt-1">Applied {r.since} · Docs: {r.docs}</div>
+          </div>
+          <div className="flex gap-2">
+            <button className="gradient-lime px-4 py-2 rounded-xl text-black text-sm font-bold">✅ Approve</button>
+            <button className="border border-red-500/30 bg-red-500/10 px-4 py-2 rounded-xl text-red-400 text-sm font-bold">❌ Reject</button>
+          </div>
+        </div>
+      ))}
+    </div>
+    <div className="glass border border-white/5 rounded-2xl p-5">
+      <h3 className="font-display font-bold text-white mb-4">All Restaurants (47)</h3>
+      {['The Protein Kitchen','Campus Bites','Muscle Meal Co.','Green Bowl','Desi Dhaba Express','Shake Station'].map((name, i) => (
+        <div key={i} className="flex items-center gap-4 p-3 table-row">
+          <span className="text-2xl">{'🥗🌮💪🥙🍛🥤'.split('')[i]}</span>
+          <div className="flex-1">
+            <div className="font-semibold text-white text-sm">{name}</div>
+            <div className="text-gray-500 text-xs">⭐ {(4.2+i*0.1).toFixed(1)} · {120+i*80} orders</div>
+          </div>
+          <StatusBadge status={i<5 ? 'active' : 'pending'} />
+          <div className="flex gap-1">
+            <label className="toggle-switch"><input type="checkbox" defaultChecked={i<5} /><span className="toggle-knob" /></label>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// ── Foods Tab ──────────────────────────────────────────────
+const FoodsPanel = () => (
+  <div>
+    <div className="glass border border-white/5 rounded-2xl p-5">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="font-display font-bold text-white">Top Performing Menu Items</h3>
+        <button className="gradient-orange px-4 py-2 rounded-xl text-white text-sm font-bold">+ Add Item</button>
+      </div>
+      <table className="w-full">
+        <thead className="border-b border-white/5">
+          <tr className="text-gray-500 text-xs uppercase tracking-wider">
+            {['#','Item','Restaurant','Orders','Revenue','Action'].map(h => (
+              <th key={h} className="text-left py-3 px-3 font-medium">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {TOP_FOODS.map((f, i) => (
+            <tr key={i} className="table-row">
+              <td className="py-3 px-3 text-gray-500 font-bold">#{i+1}</td>
+              <td className="py-3 px-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-orange-500/10 flex items-center justify-center text-lg">{['🥗','🍜','🍽️','🥤','🌯'][i]}</div>
+                  <span className="text-white text-sm font-medium">{f.name}</span>
+                </div>
+              </td>
+              <td className="py-3 px-3 text-gray-400 text-sm">{f.restaurant}</td>
+              <td className="py-3 px-3 text-white font-bold">{f.orders.toLocaleString()}</td>
+              <td className="py-3 px-3 text-lime-400 font-bold">{f.revenue}</td>
+              <td className="py-3 px-3">
+                <button className="text-orange-400 text-xs font-semibold hover:text-orange-300">Edit</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
+
+// ── Analytics Tab ──────────────────────────────────────────
+const AnalyticsPanel = () => (
+  <div className="space-y-5">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {[['📈','GMV Growth','+34%','Month over month'],['🎯','Conversion','68%','Orders / sessions'],['🔁','Retention','72%','Monthly active'],['⚡','Avg Delivery','18 min','Platform average']].map(([e,l,v,s]) => (
+        <div key={l} className="glass border border-white/5 rounded-2xl p-5">
+          <div className="text-2xl mb-2">{e}</div>
+          <div className="font-display font-black text-white text-2xl">{v}</div>
+          <div className="text-gray-400 text-sm mt-0.5">{l}</div>
+          <div className="text-gray-600 text-xs">{s}</div>
+        </div>
+      ))}
+    </div>
+    <div className="glass border border-white/5 rounded-2xl p-5">
+      <h3 className="font-display font-bold text-white mb-5">Revenue Trend (Last 7 Days)</h3>
+      <RevenueChart />
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="glass border border-white/5 rounded-2xl p-5">
+        <h3 className="font-display font-bold text-white mb-4">User Acquisition</h3>
+        {[['Organic','42%'],['Google','28%'],['Referral','18%'],['Social','12%']].map(([src,pct]) => (
+          <div key={src} className="mb-3">
+            <div className="flex justify-between mb-1">
+              <span className="text-gray-400 text-sm">{src}</span>
+              <span className="text-white font-bold text-sm">{pct}</span>
+            </div>
+            <div className="progress-track">
+              <div className="h-full gradient-orange rounded-full" style={{width:pct}} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="glass border border-white/5 rounded-2xl p-5">
+        <h3 className="font-display font-bold text-white mb-4">Top Cities</h3>
+        {[['Delhi','34%','1,089 orders'],['Noida','22%','705 orders'],['Gurgaon','18%','577 orders'],['Bangalore','14%','449 orders'],['Mumbai','12%','385 orders']].map(([city,pct,cnt]) => (
+          <div key={city} className="flex items-center gap-3 mb-3">
+            <div className="text-lg">{['🏙️','🌆','🌇','🌃','🌉'][['Delhi','Noida','Gurgaon','Bangalore','Mumbai'].indexOf(city)]}</div>
+            <div className="flex-1">
+              <div className="flex justify-between mb-1"><span className="text-white text-sm">{city}</span><span className="text-gray-500 text-xs">{cnt}</span></div>
+              <div className="progress-track"><div className="h-full gradient-orange rounded-full" style={{width:pct}} /></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+// ── Coupons Tab ────────────────────────────────────────────
+const CouponsPanel = () => {
+  const [showCreate, setShowCreate] = useState(false);
+  const coupons = [
+    { code:'CAMPUS20', type:'percentage', value:'20%', minOrder:'₹199', used:1204, limit:5000, expires:'May 31', active:true },
+    { code:'ZAAVO100', type:'fixed', value:'₹100', minOrder:'₹299', used:823, limit:2000, expires:'Apr 30', active:true },
+    { code:'GYMPOWER', type:'free_delivery', value:'Free Del', minOrder:'₹249', used:341, limit:1000, expires:'Jun 15', active:true },
+    { code:'NIGHT50', type:'percentage', value:'50%', minOrder:'₹149', used:2102, limit:9999, expires:'Ongoing', active:false },
+  ];
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="font-display font-bold text-white text-xl">Coupon Management</h3>
+        <button onClick={() => setShowCreate(true)} className="gradient-orange px-5 py-2.5 rounded-xl text-white font-bold">+ Create Coupon</button>
+      </div>
+      <div className="glass border border-white/5 rounded-2xl overflow-hidden">
+        <table className="w-full">
+          <thead className="border-b border-white/5">
+            <tr className="text-gray-500 text-xs uppercase tracking-wider">
+              {['Code','Type','Value','Min Order','Used/Limit','Expires','Status','Toggle'].map(h => (
+                <th key={h} className="text-left py-3 px-4 font-medium">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {coupons.map((c, i) => (
+              <tr key={i} className="table-row">
+                <td className="py-3 px-4 font-mono font-bold text-orange-400">{c.code}</td>
+                <td className="py-3 px-4 text-gray-400 text-sm">{c.type}</td>
+                <td className="py-3 px-4 text-white font-bold">{c.value}</td>
+                <td className="py-3 px-4 text-gray-400 text-sm">{c.minOrder}</td>
+                <td className="py-3 px-4">
+                  <div className="text-white text-sm">{c.used} / {c.limit}</div>
+                  <div className="progress-track mt-1 w-20"><div className="h-full gradient-orange rounded-full" style={{width:`${(c.used/c.limit)*100}%`}} /></div>
+                </td>
+                <td className="py-3 px-4 text-gray-400 text-sm">{c.expires}</td>
+                <td className="py-3 px-4"><StatusBadge status={c.active ? 'active' : 'cancelled'} /></td>
+                <td className="py-3 px-4"><label className="toggle-switch"><input type="checkbox" defaultChecked={c.active} /><span className="toggle-knob" /></label></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// ── Delivery Tab ───────────────────────────────────────────
+const DeliveryPanel = () => (
+  <div className="space-y-5">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {[['🛵','Online Partners','34 / 128'],['📦','Active Deliveries','12'],['⏱️','Avg Delivery Time','18 min'],['💰','Today Payouts','₹8,240']].map(([e,l,v]) => (
+        <div key={l} className="glass border border-white/5 rounded-2xl p-4">
+          <div className="text-3xl mb-2">{e}</div>
+          <div className="font-display font-black text-white text-xl">{v}</div>
+          <div className="text-gray-500 text-sm mt-0.5">{l}</div>
+        </div>
+      ))}
+    </div>
+    <div className="glass border border-white/5 rounded-2xl p-5">
+      <h3 className="font-display font-bold text-white mb-4">Active Delivery Partners</h3>
+      {[{name:'Rahul Kumar',rating:4.9,deliveries:312,today:8,status:'delivering',earnings:'₹480'},
+        {name:'Amit Singh',rating:4.7,deliveries:189,today:5,status:'online',earnings:'₹300'},
+        {name:'Ravi Patel',rating:4.8,deliveries:256,today:7,status:'delivering',earnings:'₹420'},
+        {name:'Sanjay Verma',rating:4.6,deliveries:143,today:3,status:'online',earnings:'₹180'}].map((p,i) => (
+        <div key={i} className="flex items-center gap-4 p-3 table-row">
+          <div className="w-10 h-10 gradient-orange rounded-xl flex items-center justify-center font-bold text-white text-sm">{p.name.split(' ').map(w=>w[0]).join('')}</div>
+          <div className="flex-1">
+            <div className="font-semibold text-white">{p.name}</div>
+            <div className="text-gray-500 text-xs">⭐ {p.rating} · {p.deliveries} total deliveries</div>
+          </div>
+          <div className="text-center hidden md:block">
+            <div className="font-bold text-white">{p.today}</div>
+            <div className="text-gray-500 text-xs">Today</div>
+          </div>
+          <div className="text-lime-400 font-bold">{p.earnings}</div>
+          <StatusBadge status={p.status === 'delivering' ? 'out_for_delivery' : 'active'} />
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+ReactDOM.createRoot(document.getElementById('root')).render(<AdminApp />);
+</script>
+</body>
+</html>

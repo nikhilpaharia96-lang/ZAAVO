@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ZAAVO Restaurant Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root { --orange:#FF5722; --lime:#AEEA00; --dark:#0A0A0A; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'DM Sans',sans-serif; background:var(--dark); color:#fff; -webkit-font-smoothing:antialiased; }
+  .font-display { font-family:'Syne',sans-serif; }
+  ::-webkit-scrollbar { width:3px; } ::-webkit-scrollbar-thumb { background:#FF5722; border-radius:2px; }
+  .glass { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); backdrop-filter:blur(20px); }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)} }
+  @keyframes ping { 0%,100%{opacity:1}50%{opacity:0.3} }
+  .fade-up { animation:fadeUp 0.4s ease forwards; }
+  .ping { animation:ping 2s ease-in-out infinite; }
+  .btn-orange { background:linear-gradient(135deg,#FF5722,#FF7043); color:#fff; border:none; cursor:pointer; transition:all 0.2s ease; }
+  .btn-orange:hover { transform:translateY(-1px); box-shadow:0 8px 20px rgba(255,87,34,0.35); }
+  .nav-tab { cursor:pointer; transition:all 0.2s; border-bottom:2px solid transparent; color:#888; }
+  .nav-tab:hover { color:#fff; }
+  .nav-tab.active { color:#FF5722; border-color:#FF5722; }
+  .order-card { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); transition:all 0.3s ease; }
+  .order-card:hover { border-color:rgba(255,87,34,0.2); background:rgba(255,87,34,0.03); }
+  .toggle { position:relative; width:44px; height:24px; }
+  .toggle input { opacity:0; width:0; height:0; }
+  .knob { position:absolute; cursor:pointer; inset:0; background:#333; border-radius:24px; transition:.3s; }
+  .knob:before { content:''; position:absolute; width:18px; height:18px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.3s; }
+  input:checked+.knob { background:#FF5722; }
+  input:checked+.knob:before { transform:translateX(20px); }
+  .status-badge { padding:4px 10px; border-radius:100px; font-size:11px; font-weight:700; }
+  .status-new { background:rgba(255,87,34,0.15); border:1px solid rgba(255,87,34,0.3); color:#FF5722; }
+  .status-prep { background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3); color:#FCD34D; }
+  .status-ready { background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.3); color:#93C5FD; }
+  .status-done { background:rgba(174,234,0,0.1); border:1px solid rgba(174,234,0,0.25); color:#AEEA00; }
+  .skeleton { background:linear-gradient(90deg,#1A1A1A 25%,#222 50%,#1A1A1A 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:8px; }
+  @keyframes shimmer { from{background-position:-200% 0}to{background-position:200% 0} }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+// ── Fake live orders ──────────────────────────────────────
+const INIT_ORDERS = [
+  { id:'ZAV-8921', customer:'Rohan Sharma', phone:'98112-34567', items:[{name:'High Protein Bowl',qty:1,price:249},{name:'Protein Shake',qty:1,price:159}], total:408, address:'Hostel Block 7, Room 312', time:'2 min ago', status:'new', instructions:'Extra spicy please', deliveryType:'delivery' },
+  { id:'ZAV-8918', customer:'Sneha Patel', phone:'99445-67890', items:[{name:'Grilled Paneer Tikka',qty:2,price:199},{name:'Green Detox Shake',qty:1,price:139}], total:537, address:'FitLife Studio, Sector 18', time:'8 min ago', status:'preparing', instructions:'', deliveryType:'delivery' },
+  { id:'ZAV-8915', customer:'Arjun Reddy', phone:'99334-56789', items:[{name:'Salmon Power Plate',qty:1,price:389}], total:389, address:'NIT Campus Gate', time:'15 min ago', status:'ready', instructions:'No onions', deliveryType:'delivery' },
+  { id:'ZAV-8911', customer:'Dev Kumar', phone:'98765-43210', items:[{name:'High Protein Bowl',qty:2,price:249},{name:'Vegan Wrap',qty:1,price:189}], total:687, address:'Boys Hostel B-4', time:'22 min ago', status:'done', instructions:'', deliveryType:'delivery' },
+];
+
+const MENU_ITEMS = [
+  { id:1, name:'High Protein Chicken Bowl', category:'High Protein', price:249, orders:1204, available:true, image:'🥗' },
+  { id:2, name:'Grilled Paneer Tikka', category:'High Protein', price:199, orders:876, available:true, image:'🧀' },
+  { id:3, name:'Salmon Power Plate', category:'Premium', price:389, orders:543, available:true, image:'🐟' },
+  { id:4, name:'Keto Salad Bowl', category:'Keto', price:299, orders:321, available:false, image:'🥗' },
+  { id:5, name:'Post-Workout Shake', category:'Beverages', price:159, orders:2341, available:true, image:'🥤' },
+  { id:6, name:'Mass Gainer Thali', category:'Bulking', price:349, orders:654, available:true, image:'🍽️' },
+];
+
+const WEEKLY_REVENUE = [42000,38000,55000,61000,78000,92000,84000];
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+const StatusBadge = ({ s }) => {
+  const cfg = { new:['status-new','🔔 New'], preparing:['status-prep','👨‍🍳 Preparing'], ready:['status-ready','📦 Ready'], done:['status-done','✅ Done'] };
+  const [cls, label] = cfg[s] || ['status-new', s];
+  return <span className={`status-badge ${cls}`}>{label}</span>;
+};
+
+const RestaurantApp = () => {
+  const [tab, setTab]           = useState('orders');
+  const [orders, setOrders]     = useState(INIT_ORDERS);
+  const [isOpen, setIsOpen]     = useState(true);
+  const [menu, setMenu]         = useState(MENU_ITEMS);
+  const [showAddItem, setShowAddItem] = useState(false);
+  const [newItem, setNewItem]   = useState({ name:'', price:'', category:'High Protein', description:'' });
+  const [expandedOrder, setExpandedOrder] = useState(null);
+
+  // Simulate new order every 12s
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const newOrder = {
+        id: `ZAV-${Math.floor(8922 + Math.random()*100)}`,
+        customer: ['Priya Mehta','Amit Sharma','Kavya Reddy'][Math.floor(Math.random()*3)],
+        phone: '9900' + Math.floor(100000 + Math.random()*900000),
+        items: [{ name:'High Protein Bowl', qty: Math.ceil(Math.random()*2), price: 249 }],
+        total: 249 + Math.floor(Math.random()*200),
+        address: ['Hostel Block 3','Campus Gate','Gym Building'][Math.floor(Math.random()*3)],
+        time: 'Just now',
+        status: 'new',
+        instructions: '',
+        deliveryType: 'delivery',
+      };
+      setOrders(prev => [newOrder, ...prev]);
+    }, 12000);
+    return () => clearTimeout(t);
+  }, []);
+
+  const advanceStatus = (orderId) => {
+    const flow = { new:'preparing', preparing:'ready', ready:'done' };
+    setOrders(prev => prev.map(o => o.id === orderId && flow[o.status] ? {...o, status: flow[o.status]} : o));
+  };
+
+  const toggleItem = (id) => {
+    setMenu(prev => prev.map(m => m.id === id ? {...m, available: !m.available} : m));
+  };
+
+  const addMenuItem = () => {
+    if (!newItem.name || !newItem.price) return;
+    setMenu(prev => [...prev, { id: Date.now(), ...newItem, price: parseInt(newItem.price), orders: 0, available: true, image: '🍽️' }]);
+    setNewItem({ name:'', price:'', category:'High Protein', description:'' });
+    setShowAddItem(false);
+  };
+
+  const activeOrders = orders.filter(o => o.status !== 'done');
+  const todayRevenue = orders.reduce((s, o) => s + o.total, 0);
+  const maxRevenue   = Math.max(...WEEKLY_REVENUE);
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      {/* Header */}
+      <header className="glass border-b border-white/5 px-5 py-4 flex items-center gap-4">
+        <div className="flex items-center gap-3 flex-1">
+          <div className="w-10 h-10 rounded-2xl btn-orange flex items-center justify-center text-2xl">🥗</div>
+          <div>
+            <div className="font-display font-black text-white text-lg">The Protein Kitchen</div>
+            <div className="text-gray-500 text-xs">Restaurant Dashboard · Raj Patel</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          {/* Live order pulse */}
+          {activeOrders.length > 0 && (
+            <div className="flex items-center gap-2 bg-orange-500/10 border border-orange-500/20 rounded-xl px-3 py-1.5">
+              <div className="w-2 h-2 rounded-full bg-orange-400 ping" />
+              <span className="text-orange-400 text-sm font-bold">{activeOrders.length} live</span>
+            </div>
+          )}
+          {/* Open/Close Toggle */}
+          <div className="flex items-center gap-2 glass border border-white/10 rounded-xl px-4 py-2">
+            <span className={`text-sm font-bold ${isOpen ? 'text-lime-400' : 'text-red-400'}`}>{isOpen ? '🟢 Open' : '🔴 Closed'}</span>
+            <label className="toggle"><input type="checkbox" checked={isOpen} onChange={() => setIsOpen(!isOpen)} /><span className="knob" /></label>
+          </div>
+        </div>
+      </header>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-5">
+        {[
+          ['📦','Today\'s Orders', orders.length, '+12 vs yesterday'],
+          ['💰','Today\'s Revenue', `₹${todayRevenue.toLocaleString()}`, '+18% growth'],
+          ['⭐','Avg Rating', '4.8 / 5', '1,204 reviews'],
+          ['🛵','Pending Deliveries', activeOrders.length, 'waiting to be assigned'],
+        ].map(([icon, label, val, sub]) => (
+          <div key={label} className="glass border border-white/5 rounded-2xl p-4">
+            <div className="text-2xl mb-2">{icon}</div>
+            <div className="font-display font-black text-white text-xl">{val}</div>
+            <div className="text-gray-400 text-xs">{label}</div>
+            <div className="text-gray-600 text-xs mt-0.5">{sub}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 border-b border-white/5 px-5">
+        {['orders','menu','analytics','settings'].map(t => (
+          <button key={t} onClick={() => setTab(t)} className={`nav-tab px-5 py-3 font-semibold text-sm capitalize ${tab===t ? 'active' : ''}`}>{t}</button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 p-5 overflow-y-auto">
+
+        {/* ORDERS TAB */}
+        {tab === 'orders' && (
+          <div className="fade-up">
+            {/* Filter chips */}
+            <div className="flex gap-2 mb-5">
+              {['All','New','Preparing','Ready','Done'].map(f => (
+                <button key={f} className="px-4 py-1.5 rounded-full text-sm font-medium border border-white/5 text-gray-400 hover:border-orange-500/30 hover:text-orange-400 transition-all">{f}</button>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {orders.map(order => (
+                <div key={order.id} className="order-card rounded-2xl p-4">
+                  {/* Order header */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <div className="font-mono text-orange-400 text-sm font-bold">{order.id}</div>
+                      <div className="font-semibold text-white mt-0.5">{order.customer}</div>
+                      <div className="text-gray-500 text-xs">{order.phone} · {order.time}</div>
+                    </div>
+                    <StatusBadge s={order.status} />
+                  </div>
+
+                  {/* Items */}
+                  <div className="border-t border-white/5 pt-3 mb-3">
+                    {order.items.map((item, i) => (
+                      <div key={i} className="flex justify-between text-sm py-0.5">
+                        <span className="text-gray-300">{item.qty}× {item.name}</span>
+                        <span className="text-white font-semibold">₹{item.price * item.qty}</span>
+                      </div>
+                    ))}
+                    <div className="flex justify-between font-display font-bold text-white text-base mt-2 pt-2 border-t border-white/5">
+                      <span>Total</span><span className="text-orange-400">₹{order.total}</span>
+                    </div>
+                  </div>
+
+                  {/* Address + Notes */}
+                  <div className="text-xs text-gray-500 mb-3">
+                    📍 {order.address}
+                    {order.instructions && <div className="text-yellow-400/70 mt-1">📝 {order.instructions}</div>}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2">
+                    {order.status !== 'done' && (
+                      <button onClick={() => advanceStatus(order.id)} className="btn-orange flex-1 py-2.5 rounded-xl font-bold text-sm">
+                        {order.status === 'new' ? '✅ Accept & Start' : order.status === 'preparing' ? '📦 Mark Ready' : '🛵 Dispatch'}
+                      </button>
+                    )}
+                    {order.status !== 'done' && (
+                      <button onClick={() => setOrders(prev => prev.map(o => o.id === order.id ? {...o, status:'done'} : o))} className="glass border border-red-500/20 text-red-400 px-3 py-2.5 rounded-xl text-sm font-semibold hover:bg-red-500/10 transition-colors">
+                        ✕
+                      </button>
+                    )}
+                    {order.status === 'done' && (
+                      <div className="flex-1 py-2.5 text-center text-lime-400 text-sm font-bold">✅ Completed</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* MENU TAB */}
+        {tab === 'menu' && (
+          <div className="fade-up">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-display font-bold text-white text-xl">Menu Items ({menu.length})</h3>
+              <button onClick={() => setShowAddItem(true)} className="btn-orange px-5 py-2.5 rounded-xl font-bold text-sm">+ Add Item</button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {menu.map(item => (
+                <div key={item.id} className={`order-card rounded-2xl p-4 ${!item.available ? 'opacity-50' : ''}`}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-3xl">{item.image}</div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-white text-sm">{item.name}</div>
+                      <div className="text-gray-500 text-xs">{item.category} · {item.orders} orders</div>
+                    </div>
+                    <label className="toggle"><input type="checkbox" checked={item.available} onChange={() => toggleItem(item.id)} /><span className="knob" /></label>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-display font-black text-xl text-white">₹{item.price}</span>
+                    <div className="flex gap-2">
+                      <button className="text-orange-400 text-xs font-semibold hover:text-orange-300">Edit</button>
+                      <button onClick={() => setMenu(prev => prev.filter(m => m.id !== item.id))} className="text-red-400 text-xs font-semibold hover:text-red-300">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Add Item Modal */}
+            {showAddItem && (
+              <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50">
+                <div className="glass border border-white/10 rounded-3xl p-6 w-full max-w-md fade-up">
+                  <h3 className="font-display font-bold text-white text-xl mb-5">Add Menu Item</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-gray-400 text-sm block mb-1.5">Item Name</label>
+                      <input value={newItem.name} onChange={e => setNewItem({...newItem, name:e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-orange-500/50" placeholder="e.g. Grilled Chicken Salad" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-gray-400 text-sm block mb-1.5">Price (₹)</label>
+                        <input type="number" value={newItem.price} onChange={e => setNewItem({...newItem, price:e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-orange-500/50" placeholder="249" />
+                      </div>
+                      <div>
+                        <label className="text-gray-400 text-sm block mb-1.5">Category</label>
+                        <select value={newItem.category} onChange={e => setNewItem({...newItem, category:e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-orange-500/50">
+                          {['High Protein','Keto','Vegan','Bulking','Cutting','Budget','Premium'].map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-gray-400 text-sm block mb-1.5">Description</label>
+                      <textarea value={newItem.description} onChange={e => setNewItem({...newItem, description:e.target.value})} rows="2" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none resize-none focus:border-orange-500/50" placeholder="Short description..." />
+                    </div>
+                  </div>
+                  <div className="flex gap-3 mt-5">
+                    <button onClick={() => setShowAddItem(false)} className="flex-1 py-3 rounded-xl border border-white/10 text-gray-400 font-semibold hover:text-white transition-colors">Cancel</button>
+                    <button onClick={addMenuItem} className="flex-1 btn-orange py-3 rounded-xl font-bold">Add Item</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ANALYTICS TAB */}
+        {tab === 'analytics' && (
+          <div className="fade-up space-y-5">
+            {/* Revenue chart */}
+            <div className="glass border border-white/5 rounded-2xl p-5">
+              <h3 className="font-display font-bold text-white mb-5">Weekly Revenue</h3>
+              <div className="flex items-end gap-2 h-40">
+                {WEEKLY_REVENUE.map((rev, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                    <div className="text-xs text-gray-500 mb-1">₹{(rev/1000).toFixed(0)}k</div>
+                    <div className="w-full rounded-t-lg btn-orange" style={{height:`${(rev/maxRevenue)*120}px`, opacity:0.5 + (i/7)*0.5}} />
+                    <div className="text-xs text-gray-500">{DAYS[i]}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* Top items */}
+              <div className="glass border border-white/5 rounded-2xl p-5">
+                <h3 className="font-display font-bold text-white mb-4">Top Selling Items</h3>
+                {menu.sort((a,b)=>b.orders-a.orders).slice(0,4).map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 mb-3">
+                    <div className="font-bold text-orange-400 w-4">#{i+1}</div>
+                    <div className="flex-1">
+                      <div className="text-white text-sm font-medium">{item.name}</div>
+                      <div className="h-1 bg-white/5 rounded-full mt-1"><div className="h-full rounded-full" style={{width:`${(item.orders/2341)*100}%`,background:'linear-gradient(90deg,#FF5722,#FF7043)'}} /></div>
+                    </div>
+                    <div className="text-gray-400 text-xs">{item.orders}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Revenue breakdown */}
+              <div className="glass border border-white/5 rounded-2xl p-5">
+                <h3 className="font-display font-bold text-white mb-4">Revenue Split</h3>
+                {[['Fitness Meals','52%'],['Protein Shakes','28%'],['Budget Meals','20%']].map(([l,p]) => (
+                  <div key={l} className="mb-4">
+                    <div className="flex justify-between mb-1.5"><span className="text-gray-400 text-sm">{l}</span><span className="text-white font-bold text-sm">{p}</span></div>
+                    <div className="h-2 bg-white/5 rounded-full"><div className="h-full rounded-full btn-orange" style={{width:p}} /></div>
+                  </div>
+                ))}
+                <div className="mt-4 pt-4 border-t border-white/5">
+                  <div className="flex justify-between"><span className="text-gray-400 text-sm">Total This Month</span><span className="font-display font-black text-white text-xl">₹1,84,920</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SETTINGS TAB */}
+        {tab === 'settings' && (
+          <div className="fade-up max-w-xl space-y-5">
+            {[
+              ['🏪 Restaurant Info', [['Restaurant Name','The Protein Kitchen'],['Phone','9955678901'],['Email','raj@proteinktchn.com'],['FSSAI Number','10023999001234']]],
+              ['🚴 Delivery Settings', [['Min Order Amount','₹199'],['Delivery Fee','₹30'],['Free Delivery Above','₹299'],['Delivery Radius','5 km'],['Estimated Time','18-25 min']]],
+            ].map(([title, fields]) => (
+              <div key={title} className="glass border border-white/5 rounded-2xl p-5">
+                <h3 className="font-display font-bold text-white mb-4">{title}</h3>
+                <div className="space-y-3">
+                  {fields.map(([label, value]) => (
+                    <div key={label}>
+                      <label className="text-gray-500 text-xs block mb-1">{label}</label>
+                      <input defaultValue={value} className="w-full bg-white/5 border border-white/8 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-orange-500/40" />
+                    </div>
+                  ))}
+                </div>
+                <button className="btn-orange w-full py-3 rounded-xl font-bold mt-4">Save Changes</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<RestaurantApp />);
+</script>
+</body>
+</html>
